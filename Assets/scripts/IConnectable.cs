@@ -9,4 +9,6 @@ public interface IConnectable
     void Toggle(bool state);
 
     Transform GetTransform();
+
+    void Click();
 }

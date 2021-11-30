@@ -53,7 +53,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable
         sr = GetComponent<SpriteRenderer>();
     }
 
-    public void OnMouseUp()
+    public void Click()
     {
         if (isActivated && isLocked)
         {

@@ -72,6 +72,11 @@ public class PowerConnection : MonoBehaviour, IConnectable
         
     }
 
+    public void Click()
+    {
+
+    }
+
     public void Pulse()
     {
         Debug.Log(gameObject.name + " Needs to be toggled, not pulsed.");

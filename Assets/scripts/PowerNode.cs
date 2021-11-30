@@ -528,13 +528,14 @@ public class PowerNode : MonoBehaviour, IConnectable
 
 
 
-    public void OnMouseUp()
+
+
+    public void Click()
     {
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T)
         {
             Turn();
         }
-        
     }
 
     public void Toggle(bool state)
