@@ -6,17 +6,16 @@ using UnityEngine.InputSystem;
 public class DroneController : MonoBehaviour
 {
 
-    public Camera characterCamera;
     [SerializeField]
     public float speedMultiplier;
     private Vector2 movementInput;
     private PlayerInputAsset controls;
-    private CharacterController controller;
+    private Rigidbody2D rb;
 
     private void Awake()
     {
         controls = new PlayerInputAsset();
-        controller = GetComponent<CharacterController>();
+        rb = GetComponent<Rigidbody2D>();
         controls.Player.Click.performed += Click;
     }
 
@@ -51,9 +50,8 @@ public class DroneController : MonoBehaviour
 
     private void FixedUpdate()
     {
-        controller.Move(new Vector3(movementInput.x * speedMultiplier, movementInput.y * speedMultiplier, 0));
-        
-        characterCamera.transform.position = new Vector3(transform.position.x, transform.position.y, characterCamera.transform.position.z);
+
+        rb.velocity = movementInput * speedMultiplier;
     }
 
     private void OnEnable()
