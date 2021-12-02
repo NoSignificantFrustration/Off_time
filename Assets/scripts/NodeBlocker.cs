@@ -5,11 +5,15 @@ using UnityEngine;
 public class NodeBlocker : MonoBehaviour, IConnectable
 {
 
-
+    [SerializeField]
     public PowerConnection input;
+    [SerializeField]
     public PowerNode output;
+    [SerializeField]
     public Sprite[] sprites;
+    [SerializeField]
     public bool isActivated = false;
+    [SerializeField]
     public bool isLocked = true;
     private SpriteRenderer sr;
 

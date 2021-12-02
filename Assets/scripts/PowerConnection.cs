@@ -5,7 +5,7 @@ using UnityEngine.U2D;
 
 public class PowerConnection : MonoBehaviour, IConnectable
 {
-
+    [SerializeField]
     public bool active;
     [SerializeField]
     public PowerNode input;
@@ -14,19 +14,20 @@ public class PowerConnection : MonoBehaviour, IConnectable
     [SerializeField]
     public Transform[] joints;
     private LineRenderer lr;
+    [SerializeField]
     public IConnectable connectioInterface;
 
     private void Awake()
     {
-       
         lr = GetComponent<LineRenderer>();
-        lr.sharedMaterial = new Material(Shader.Find("Standard"));
         connectioInterface = output.GetComponent<IConnectable>();
+
     }
 
     // Start is called before the first frame update
     void Start()
     {
+        
         SetUpLines();
     }
 
@@ -45,7 +46,16 @@ public class PowerConnection : MonoBehaviour, IConnectable
             
         }
 
-        lr.sharedMaterial.color = new Color(255, 0, 0);
+        if (active)
+        {
+            lr.material.color = new Color(0, 255, 0);
+        }
+        else
+        {
+            lr.material.color = new Color(255, 0, 0);
+        }
+
+        
 
         lr.positionCount = joints.Length + 3;
         lr.SetPosition(0, input.transform.position);
@@ -62,11 +72,11 @@ public class PowerConnection : MonoBehaviour, IConnectable
         active = state;
         if (state)
         {
-            lr.sharedMaterial.color = new Color(0, 255, 0);
+            lr.material.color = new Color(0, 255, 0);
         }
         else
         {
-            lr.sharedMaterial.color = new Color(255, 0, 0);
+            lr.material.color = new Color(255, 0, 0);
         }
         connectioInterface.Pulse();
         

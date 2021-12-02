@@ -7,7 +7,9 @@ public class PowerNode : MonoBehaviour, IConnectable
 
     [SerializeField]
     public NodeType nodeType;
+    [SerializeField]
     public BitArray connectionArray;
+    [SerializeField]
     public bool[] inputs = new bool[4];
     [SerializeField]
     [Min(0)]
@@ -16,6 +18,8 @@ public class PowerNode : MonoBehaviour, IConnectable
     public bool isActiated;
     [SerializeField]
     public bool isLocked;
+    [SerializeField]
+    public bool skipInitialPulse;
     [SerializeField]
     public PowerConnection[] neighbours = new PowerConnection[4];
     [SerializeField]
@@ -56,15 +60,12 @@ public class PowerNode : MonoBehaviour, IConnectable
 
     void Start()
     {
-
-
         LoadSprite();
-        if (nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR)
-        {
+        if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse )
+        {  
             Pulse();
         }
         PreRotate();
-
     }
 
     // Update is called once per frame
@@ -550,6 +551,6 @@ public class PowerNode : MonoBehaviour, IConnectable
 
     public enum NodeType
     {
-        Source, I, L, T, X, NOT, AND, OR, NAND, NOR, XOR, XNOR
+        Source, I, L, T, X, NOT, AND, OR, NAND, NOR, XOR, XNOR, Goal
     }
 }
