@@ -7,6 +7,7 @@ using UnityEngine;
 public class PowerNodeEditor : Editor
 {
 
+    
     public override void OnInspectorGUI()
     {
         PowerNode powerNode = (PowerNode)target;
@@ -17,10 +18,11 @@ public class PowerNodeEditor : Editor
             powerNode.PreRotate();
         }
 
-        if (GUILayout.Button("Pulse"))
-        {
-            powerNode.Pulse();
-        }
-    }
+        //if (GUILayout.Button("Add new connector"))
+        //{
+        //    Object prefab = AssetDatabase.LoadAssetAtPath("Assets/Prefabs/Connection.prefab", typeof(GameObject));
+        //    Instantiate(prefab, powerNode.transform.position, new Quaternion(0, 0, 0, 0));
+        //}
 
+    }
 }

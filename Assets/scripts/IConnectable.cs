@@ -10,5 +10,5 @@ public interface IConnectable
 
     Transform GetTransform();
 
-    void Click();
+    void Click(DroneController drone = null);
 }

@@ -529,9 +529,12 @@ public class PowerNode : MonoBehaviour, IConnectable
 
 
 
+    public void SetNeighbour(int index, PowerConnection connection)
+    {
+        neighbours[index] = connection;
+    }
 
-
-    public void Click()
+    public void Click(DroneController drone)
     {
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T)
         {
@@ -551,6 +554,6 @@ public class PowerNode : MonoBehaviour, IConnectable
 
     public enum NodeType
     {
-        Source, I, L, T, X, NOT, AND, OR, NAND, NOR, XOR, XNOR, Goal
+        Source, I, L, T, X, NOT, AND, OR, NAND, NOR, XOR, XNOR
     }
 }

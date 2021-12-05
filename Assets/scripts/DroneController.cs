@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -8,9 +9,12 @@ public class DroneController : MonoBehaviour
 
     [SerializeField]
     public float speedMultiplier;
+    public UIEventHandler quizHandler;
     private Vector2 movementInput;
     private PlayerInputAsset controls;
     private Rigidbody2D rb;
+    private bool isSolvingPuzzle;
+    private NodeBlocker blocker;
 
     private void Awake()
     {
@@ -21,7 +25,10 @@ public class DroneController : MonoBehaviour
 
     private void Click(InputAction.CallbackContext ctx)
     {
-
+        if (isSolvingPuzzle || UIEventHandler.isPaused)
+        {
+            return;
+        }
 
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
@@ -31,7 +38,7 @@ public class DroneController : MonoBehaviour
             IConnectable iFace;
             if (hit.transform.gameObject.TryGetComponent(out iFace))
             {
-                iFace.Click();
+                iFace.Click(this);
             }
         }
     }
@@ -52,6 +59,33 @@ public class DroneController : MonoBehaviour
     {
 
         rb.velocity = movementInput * speedMultiplier;
+    }
+
+    public void StartQuiz(NodeBlocker nodeBlocker)
+    {
+        if (quizHandler == null)
+        {
+            Debug.LogWarning("No quizhandler found");
+            return;
+        }
+        Time.timeScale = 0f;
+        isSolvingPuzzle = true;
+        blocker = nodeBlocker;
+
+        quizHandler.StartQuiz(this);
+
+
+    }
+
+    public void FinishQuiz(bool result)
+    {
+        if (result)
+        {
+            blocker.Unlock();
+        }
+        isSolvingPuzzle = false;
+        blocker = null;
+        Time.timeScale = 1f;
     }
 
     private void OnEnable()

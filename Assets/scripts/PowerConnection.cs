@@ -17,7 +17,7 @@ public class PowerConnection : MonoBehaviour, IConnectable
     [SerializeField]
     public IConnectable connectioInterface;
 
-    private void Awake()
+    public void Awake()
     {
         lr = GetComponent<LineRenderer>();
         connectioInterface = output.GetComponent<IConnectable>();
@@ -82,7 +82,7 @@ public class PowerConnection : MonoBehaviour, IConnectable
         
     }
 
-    public void Click()
+    public void Click(DroneController drone)
     {
 
     }
