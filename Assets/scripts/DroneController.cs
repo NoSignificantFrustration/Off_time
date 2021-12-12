@@ -13,6 +13,7 @@ public class DroneController : MonoBehaviour
     private Vector2 movementInput;
     private PlayerInputAsset controls;
     private Rigidbody2D rb;
+    private SpriteRenderer sr;
     private bool isSolvingPuzzle;
     private NodeBlocker blocker;
 
@@ -20,7 +21,9 @@ public class DroneController : MonoBehaviour
     {
         controls = new PlayerInputAsset();
         rb = GetComponent<Rigidbody2D>();
+        sr = GetComponent<SpriteRenderer>();
         controls.Player.Click.performed += Click;
+        
     }
 
     private void Click(InputAction.CallbackContext ctx)
@@ -52,7 +55,15 @@ public class DroneController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        movementInput = controls.Player.Movement.ReadValue<Vector2>();
+        if (!UIEventHandler.isPaused)
+        {
+            movementInput = controls.Player.Movement.ReadValue<Vector2>();
+            Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
+        }
+        
+
+        
     }
 
     private void FixedUpdate()
