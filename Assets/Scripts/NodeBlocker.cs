@@ -5,16 +5,11 @@ using UnityEngine;
 
 public class NodeBlocker : MonoBehaviour, IConnectable
 {
-    [SerializeField]
-    public PowerConnection input;
-    [SerializeField]
-    public PowerNode output;
-    [SerializeField]
-    public Sprite[] sprites;
-    [SerializeField]
-    public bool isActivated = false;
-    [SerializeField]
-    public bool isLocked = true;
+    [SerializeField] private PowerConnection input;
+    [SerializeField] private PowerNode output;
+    [SerializeField] private Sprite[] sprites;
+    [SerializeField] private bool isActivated = false;
+    [SerializeField] private bool isLocked = true;
     private SpriteRenderer sr;
 
     public void LoadSprite()
@@ -43,7 +38,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable
 
     public void Pulse()
     {
-        isActivated = input.active;
+        isActivated = input.GetActive();
         LoadSprite();
     }
 
@@ -71,7 +66,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable
     public void Unlock()
     {
         isLocked = false;
-        output.isLocked = false;
+        output.Unlock();
         output.Pulse();
         LoadSprite();
     }

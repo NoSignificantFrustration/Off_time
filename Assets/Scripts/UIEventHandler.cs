@@ -9,9 +9,10 @@ public class UIEventHandler : MonoBehaviour
 {
 
     public static bool isPaused = false;
-    public DatabaseManager databaseManager;
-    public GameObject pauseMenu;
-    public GameObject quizMenu;
+    [SerializeField] private DatabaseManager databaseManager;
+    [SerializeField] private GameObject pauseMenu;
+    [SerializeField] private GameObject quizMenu;
+    [SerializeField] private QuizHandler quizHandler;
     private PlayerInputAsset controls;
     private Stack<GameObject> uiStack;
     private GameObject currentUI;
@@ -123,6 +124,7 @@ public class UIEventHandler : MonoBehaviour
 
         }
         Debug.Log("Quiz started");
+        quizHandler.StartQuiz();
         OpenMenu(quizMenu);
     }
 

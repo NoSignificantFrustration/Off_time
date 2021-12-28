@@ -18,7 +18,7 @@ public class PowerConnectionEditor : Editor
 
         if (GUILayout.Button("Refresh line"))
         {
-            powerConnection.connectioInterface = powerConnection.output.GetComponent<IConnectable>();
+            powerConnection.SetConnectionInterface(powerConnection.GetOutput().GetComponent<IConnectable>());
             powerConnection.SetUpLines();
         }
     }

@@ -5,22 +5,18 @@ using UnityEngine.U2D;
 
 public class PowerConnection : MonoBehaviour, IConnectable
 {
-    [SerializeField]
-    public bool active;
-    [SerializeField]
-    public PowerNode input;
-    [SerializeField]
-    public GameObject output;
-    [SerializeField]
-    public Transform[] joints;
+
+    [SerializeField] private bool active;
+    [SerializeField] private PowerNode input;
+    [SerializeField] private GameObject output;
+    [SerializeField] private Transform[] joints;
     private LineRenderer lr;
-    [SerializeField]
-    public IConnectable connectioInterface;
+    [SerializeField] private IConnectable outputInterface;
 
     public void Awake()
     {
         lr = GetComponent<LineRenderer>();
-        connectioInterface = output.GetComponent<IConnectable>();
+        outputInterface = output.GetComponent<IConnectable>();
 
     }
 
@@ -64,7 +60,7 @@ public class PowerConnection : MonoBehaviour, IConnectable
         {
             lr.SetPosition(i + 2, joints[i].position);
         }
-        lr.SetPosition(joints.Length + 2, connectioInterface.GetTransform().position);
+        lr.SetPosition(joints.Length + 2, outputInterface.GetTransform().position);
     }
 
     public void Toggle(bool state)
@@ -78,7 +74,7 @@ public class PowerConnection : MonoBehaviour, IConnectable
         {
             lr.material.color = new Color(255, 0, 0);
         }
-        connectioInterface.Pulse();
+        outputInterface.Pulse();
         
     }
 
@@ -95,5 +91,35 @@ public class PowerConnection : MonoBehaviour, IConnectable
     public Transform GetTransform()
     {
         return transform;
+    }
+
+    public bool GetActive()
+    {
+        return active;
+    }
+    
+    public PowerNode GetInput()
+    {
+        return input;
+    }
+
+    public void SetInput(PowerNode newInput)
+    {
+        input = newInput;
+    }
+
+    public GameObject GetOutput()
+    {
+        return output;
+    }
+
+    public void SetOutput(GameObject newOutput)
+    {
+        output = newOutput;
+    }
+
+    public void SetConnectionInterface(IConnectable newIf)
+    {
+        outputInterface = newIf;
     }
 }

@@ -9,10 +9,9 @@ using UnityEngine.UI;
 public class DatabaseManager : MonoBehaviour
 {
 
-    [SerializeField]
-    public string dbName = "GameDB";
+    [SerializeField] private string dbName = "GameDB";
     private string filePath;
-    public Text outputField;
+    [SerializeField] private Text outputField;
 
     private void Awake()
     {
@@ -71,6 +70,57 @@ public class DatabaseManager : MonoBehaviour
             connection.Close();
         }
 
+    }
+
+    public void RunQuery(string input)
+    {
+        
+        using (SqliteConnection connection = new SqliteConnection(filePath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = input;
+                command.ExecuteNonQuery();
+
+     
+
+            }
+            connection.Close();
+        }
+
+    }
+
+
+    public string[] GetQuestion()
+    {
+        string[] dat = new string[5];
+
+        using (SqliteConnection connection = new SqliteConnection(filePath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 1";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+
+                    reader.Read();
+
+                    dat[0] = reader["question"].ToString();
+                    dat[1] = reader["good_answer"].ToString();
+                    dat[2] = reader["bad_answer1"].ToString();
+                    dat[3] = reader["bad_answer2"].ToString();
+                    dat[4] = reader["bad_answer3"].ToString();
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
+        return dat;
     }
 
 

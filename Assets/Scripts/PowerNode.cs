@@ -5,25 +5,15 @@ using UnityEngine;
 public class PowerNode : MonoBehaviour, IConnectable
 {
 
-    [SerializeField]
-    public NodeType nodeType;
-    [SerializeField]
-    public BitArray connectionArray;
-    [SerializeField]
-    public bool[] inputs = new bool[4];
-    [SerializeField]
-    [Min(0)]
-    public int rotation;
-    [SerializeField]
-    public bool isActiated;
-    [SerializeField]
-    public bool isLocked;
-    [SerializeField]
-    public bool skipInitialPulse;
-    [SerializeField]
-    public PowerConnection[] neighbours = new PowerConnection[4];
-    [SerializeField]
-    public Sprite[] sprites;
+    [SerializeField] private NodeType nodeType;
+    [SerializeField] private BitArray connectionArray;
+    [SerializeField] private bool[] inputs = new bool[4];
+    [SerializeField] [Min(0)] private int rotation;
+    [SerializeField] private bool isActiated;
+    [SerializeField] private bool isLocked;
+    [SerializeField] private bool skipInitialPulse;
+    [SerializeField] private PowerConnection[] neighbours = new PowerConnection[4];
+    [SerializeField] private Sprite[] sprites;
     private SpriteRenderer sr;
 
 
@@ -92,6 +82,14 @@ public class PowerNode : MonoBehaviour, IConnectable
                 tempArray[i + 1] = connectionArray[i];
             }
             connectionArray = tempArray;
+            if (rotation < 3)
+            {
+                rotation++;
+            }
+            else
+            {
+                rotation = 0;
+            }
 
             if (Application.isPlaying)
             {
@@ -136,7 +134,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 TurnEvaluate();
                 break;
             case NodeType.NOT:
-                if (isActiated == neighbours[0].active)
+                if (isActiated == neighbours[0].GetActive())
                 {
                     isActiated = !isActiated;
                     for (int i = 0; i < 4; i++)
@@ -152,7 +150,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 break;
             case NodeType.AND:
 
-                if (neighbours[0].active && neighbours[1].active)
+                if (neighbours[0].GetActive() && neighbours[1].GetActive())
                 {
                     tempActive = true;
                 }
@@ -174,7 +172,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 }
                 break;
             case NodeType.OR:
-                if (neighbours[0].active || neighbours[1].active)
+                if (neighbours[0].GetActive() || neighbours[1].GetActive())
                 {
                     tempActive = true;
                 }
@@ -196,7 +194,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 }
                 break;
             case NodeType.NAND:
-                if (neighbours[0].active && neighbours[1].active)
+                if (neighbours[0].GetActive() && neighbours[1].GetActive())
                 {
                     tempActive = false;
                 }
@@ -218,7 +216,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 }
                 break;
             case NodeType.NOR:
-                if (neighbours[0].active || neighbours[1].active)
+                if (neighbours[0].GetActive() || neighbours[1].GetActive())
                 {
                     tempActive = false;
                 }
@@ -240,7 +238,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 }
                 break;
             case NodeType.XOR:
-                if (neighbours[0].active != neighbours[1].active)
+                if (neighbours[0].GetActive() != neighbours[1].GetActive())
                 {
                     tempActive = true;
                 }
@@ -263,7 +261,7 @@ public class PowerNode : MonoBehaviour, IConnectable
                 break;
             case NodeType.XNOR:
 
-                if (neighbours[0].active == neighbours[1].active)
+                if (neighbours[0].GetActive() == neighbours[1].GetActive())
                 {
                     tempActive = true;
                 }
@@ -296,7 +294,7 @@ public class PowerNode : MonoBehaviour, IConnectable
         {
             if (connectionArray[i] && inputs[i])
             {
-                if (neighbours[i].active)
+                if (neighbours[i].GetActive())
                 {
                     tempActive = true;
                     break;
@@ -540,6 +538,20 @@ public class PowerNode : MonoBehaviour, IConnectable
         {
             Turn();
         }
+    }
+
+    public void Unlock()
+    {
+        isLocked = false;
+    }
+    public PowerConnection GetNeighbor(int nIndex)
+    {
+        return neighbours[nIndex];
+    }
+
+    public bool GetActive()
+    {
+        return isActiated;
     }
 
     public void Toggle(bool state)

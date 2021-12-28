@@ -5,10 +5,8 @@ using UnityEngine.SceneManagement;
 
 public class GoalScript : MonoBehaviour, IConnectable
 {
-    [SerializeField]
-    public PowerConnection input;
-    [SerializeField]
-    public string nextLevel;
+    [SerializeField] private PowerConnection input;
+    [SerializeField] private string nextLevel;
 
     public void Click(DroneController drone)
     {
@@ -22,7 +20,7 @@ public class GoalScript : MonoBehaviour, IConnectable
 
     public void Pulse()
     {
-        if (input.active)
+        if (input.GetActive())
         {
             SceneManager.LoadScene(nextLevel);
         }

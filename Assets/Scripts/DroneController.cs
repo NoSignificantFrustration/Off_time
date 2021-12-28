@@ -7,9 +7,8 @@ using UnityEngine.InputSystem;
 public class DroneController : MonoBehaviour
 {
 
-    [SerializeField]
-    public float speedMultiplier;
-    public UIEventHandler quizHandler;
+    [SerializeField] private float speedMultiplier;
+    [SerializeField] private UIEventHandler quizHandler;
     private Vector2 movementInput;
     private PlayerInputAsset controls;
     private Rigidbody2D rb;
@@ -57,9 +56,14 @@ public class DroneController : MonoBehaviour
     {
         if (!UIEventHandler.isPaused)
         {
-            movementInput = controls.Player.Movement.ReadValue<Vector2>();
-            Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
+            movementInput = controls.Player.Movement.ReadValue<Vector2>().normalized;
+            //Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
+            //rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
+            
+            if (movementInput.magnitude > 0)
+            {
+                rb.transform.up = (Vector3)movementInput;
+            }
         }
         
 
