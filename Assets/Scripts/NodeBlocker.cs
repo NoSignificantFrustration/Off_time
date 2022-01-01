@@ -3,13 +3,14 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class NodeBlocker : MonoBehaviour, IConnectable
+public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
 {
     [SerializeField] private PowerConnection input;
     [SerializeField] private PowerNode output;
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private bool isActivated = false;
     [SerializeField] private bool isLocked = true;
+    [SerializeField] private string uid;
     private SpriteRenderer sr;
 
     public void LoadSprite()
@@ -50,7 +51,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
-
+        
     }
 
     public void Click(DroneController drone)
@@ -77,13 +78,48 @@ public class NodeBlocker : MonoBehaviour, IConnectable
 
     }
 
+    public void Startup()
+    {
+        LoadSprite();
+        //Debug.Log(uid);
+    }
+
     // Update is called once per frame
     void Update()
     {
         
     }
 
+    public void AddToSave(SaveData saveData)
+    {
+        SaveData.BlockerData data = new SaveData.BlockerData();
+        data.uid = uid;
+        data.isAcivated = isActivated;
+        data.isLocked = isLocked;
+        saveData.blockerDatas.Add(data);
+    }
 
+    public void LoadFromSave(SaveData saveData)
+    {
+        foreach (SaveData.BlockerData item in saveData.blockerDatas)
+        {
+            if (item.uid == uid)
+            {
+                isActivated = item.isAcivated;
+                isLocked = item.isLocked;
+                LoadSprite();
+                break;
+            }
+        }
+    }
 
-
+    public UnityEngine.Object GetObject(bool force = false)
+    {
+        if (uid == null || uid == "" || force)
+        {
+            //uid = Guid.NewGuid().ToString();
+            return this;
+        }
+        return null;
+    }
 }

@@ -23,10 +23,11 @@ public class PowerConnection : MonoBehaviour, IConnectable
     // Start is called before the first frame update
     void Start()
     {
-        
         SetUpLines();
+
     }
 
+ 
     // Update is called once per frame
     void Update()
     {
@@ -121,5 +122,10 @@ public class PowerConnection : MonoBehaviour, IConnectable
     public void SetConnectionInterface(IConnectable newIf)
     {
         outputInterface = newIf;
+    }
+
+    public void SetActive(bool state)
+    {
+        active = state;
     }
 }

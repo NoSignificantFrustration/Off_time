@@ -11,7 +11,7 @@ public class RecordAdder : MonoBehaviour
 
     public void AddQuestion()
     {
-        databaseManager.RunQuery("INSERT INTO questions (difficulty, question, good_answer, bad_answer1, bad_answer2, bad_answer3) VALUES (" + quesionInputs[0].textComponent.text + ", '" + quesionInputs[1].textComponent.text + "', '" + quesionInputs[2].textComponent.text + "', '" + quesionInputs[3].textComponent.text + "', '" + quesionInputs[4].textComponent.text + "', '" + quesionInputs[5].textComponent.text + "')");
+        databaseManager.RunQuery("INSERT INTO questions (difficulty, question, good_answer, bad_answer1, bad_answer2, bad_answer3, user_added) VALUES (" + quesionInputs[0].textComponent.text + ", '" + quesionInputs[1].textComponent.text + "', '" + quesionInputs[2].textComponent.text + "', '" + quesionInputs[3].textComponent.text + "', '" + quesionInputs[4].textComponent.text + "', '" + quesionInputs[5].textComponent.text + ", 1"+ "')");
         foreach (InputField field in quesionInputs)
         {
             field.text = "";

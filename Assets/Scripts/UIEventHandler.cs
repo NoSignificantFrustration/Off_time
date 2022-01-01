@@ -116,6 +116,7 @@ public class UIEventHandler : MonoBehaviour
 
     public void StartQuiz(DroneController drone)
     {
+        
         this.drone = drone;
         if (quizMenu == null)
         {
@@ -123,7 +124,8 @@ public class UIEventHandler : MonoBehaviour
             drone.FinishQuiz(false);
 
         }
-        Debug.Log("Quiz started");
+        //Debug.Log("Quiz started");
+        isPaused = true;
         quizHandler.StartQuiz();
         OpenMenu(quizMenu);
     }
@@ -134,6 +136,19 @@ public class UIEventHandler : MonoBehaviour
         drone.FinishQuiz(result);
         currentUI.SetActive(false);
         currentUI = null;
+        isPaused = false;
+    }
+
+    public void LoadFromSave()
+    {
+        PlaySession.currentSave = "save.test";
+        SwitchScene("SampleScene");
+    }
+
+    public void StartNewGame()
+    {
+        PlaySession.currentSave = null;
+        SwitchScene("SampleScene");
     }
 
     private void OnEnable()

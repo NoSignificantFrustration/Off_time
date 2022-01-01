@@ -1,8 +1,9 @@
+using System;
 using System.Collections;
 using UnityEngine;
 
 
-public class PowerNode : MonoBehaviour, IConnectable
+public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 {
 
     [SerializeField] private NodeType nodeType;
@@ -14,6 +15,7 @@ public class PowerNode : MonoBehaviour, IConnectable
     [SerializeField] private bool skipInitialPulse;
     [SerializeField] private PowerConnection[] neighbours = new PowerConnection[4];
     [SerializeField] private Sprite[] sprites;
+    [SerializeField] private string uid;
     private SpriteRenderer sr;
 
 
@@ -50,12 +52,29 @@ public class PowerNode : MonoBehaviour, IConnectable
 
     void Start()
     {
+        
+    }
+
+    public void Startup()
+    {
         LoadSprite();
-        if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse )
-        {  
-            Pulse();
-        }
         PreRotate();
+        if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse)
+        {
+            Pulse();
+            //Debug.Log("Pulse");
+        }
+        for (int i = 0; i < 4; i++)
+        {
+            if (!inputs[i] && neighbours[i] != null && connectionArray[i])
+            {
+                neighbours[i].SetActive(isActiated);
+                neighbours[i].SetUpLines();
+            }
+
+        }
+
+
     }
 
     // Update is called once per frame
@@ -342,7 +361,7 @@ public class PowerNode : MonoBehaviour, IConnectable
         switch (nodeType)
         {
             case NodeType.Source:
-
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.I:
                 connectionArray = new BitArray(new bool[] { true, false, true, false });
@@ -362,26 +381,34 @@ public class PowerNode : MonoBehaviour, IConnectable
                 break;
             case NodeType.NOT:
                 inputs = new bool[] { true, false, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.AND:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.OR:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.NAND:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.NOR:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.XOR:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             case NodeType.XNOR:
                 inputs = new bool[] { true, true, false, false };
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
             default:
+                connectionArray = new BitArray(new bool[] { true, true, true, true });
                 break;
         }
         sr = GetComponent<SpriteRenderer>();
@@ -562,6 +589,40 @@ public class PowerNode : MonoBehaviour, IConnectable
     public Transform GetTransform()
     {
         return gameObject.transform;
+    }
+
+    public void AddToSave(SaveData saveData)
+    {
+        SaveData.NodeData data = new SaveData.NodeData();
+        data.uid = uid;
+        data.rotation = rotation;
+        data.isAcrivated = isActiated;
+        data.isLocked = isLocked;
+        saveData.nodeDatas.Add(data);
+    }
+
+    public void LoadFromSave(SaveData saveData)
+    {
+        foreach (SaveData.NodeData item in saveData.nodeDatas)
+        {
+            if (item.uid == uid)
+            {
+                rotation = item.rotation;
+                isActiated = item.isAcrivated;
+                isLocked = item.isLocked;
+                skipInitialPulse = true;
+                break;
+            }
+        }
+    }
+
+    public UnityEngine.Object GetObject(bool force = false)
+    {
+        if (uid == null || uid == "" || force)
+        {
+            return this;
+        }
+        return null;
     }
 
     public enum NodeType

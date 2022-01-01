@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: -3081196147968193935}
   m_Layer: 6
   m_Name: Node
-  m_TagString: Untagged
+  m_TagString: Node
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
@@ -50,6 +50,7 @@ MonoBehaviour:
   rotation: 0
   isActiated: 0
   isLocked: 0
+  skipInitialPulse: 0
   neighbours:
   - {fileID: 0}
   - {fileID: 0}
@@ -80,7 +81,6 @@ MonoBehaviour:
   - {fileID: 21300000, guid: 04a473056f83f4e4caf82dc634c520f3, type: 3}
   - {fileID: 21300000, guid: 8a2702939e68cb84e84b64349f19ed7f, type: 3}
   - {fileID: 21300000, guid: 3adc6a6553c11f542b10e673daaa9b6b, type: 3}
-  sr: {fileID: 0}
 --- !u!212 &4149687391964827867
 SpriteRenderer:
   m_ObjectHideFlags: 0

@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.IO;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -10,12 +11,12 @@ public class DatabaseManager : MonoBehaviour
 {
 
     [SerializeField] private string dbName = "GameDB";
-    private string filePath;
+    private string connectionPath;
     [SerializeField] private Text outputField;
 
     private void Awake()
     {
-        filePath = "URI=file:" + Application.persistentDataPath + "/" + dbName + ".db";
+        connectionPath = "URI=file:" + Application.persistentDataPath + "/" + dbName + ".db";
     }
 
     private void Start()
@@ -25,29 +26,52 @@ public class DatabaseManager : MonoBehaviour
 
     private void SetupDB()
     {
-        using (SqliteConnection connection = new SqliteConnection(filePath))
+
+        //Debug.Log(Application.streamingAssetsPath);
+        string filePath = Application.persistentDataPath + "/" + dbName + ".db";
+        if (!File.Exists(filePath))
         {
-            connection.Open();
-            using (SqliteCommand command = connection.CreateCommand())
+            string backupPath = Path.Combine(Application.streamingAssetsPath, dbName + ".db");
+            if (File.Exists(backupPath))
             {
-                command.CommandText = "CREATE TABLE IF NOT EXISTS questions (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "difficulty int(1) NOT NULL," +
-                    "question varchar(255) NOT NULL," +
-                    "good_answer varchar(100) NOT NULL," +
-                    "bad_answer1 varchar(100) NOT NULL," +
-                    "bad_answer2 varchar(100) NOT NULL," +
-                    "bad_answer3 varchar(100) NOT NULL)";
-                command.ExecuteNonQuery();
+                File.Copy(backupPath, filePath);
             }
-            connection.Close();
+            else
+            {
+                Debug.LogError("Database is missing");
+                using (SqliteConnection connection = new SqliteConnection(connectionPath))
+                {
+                    connection.Open();
+                    using (SqliteCommand command = connection.CreateCommand())
+                    {
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS questions " +
+                            "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "difficulty int(1) NOT NULL," +
+                            "question varchar(255) NOT NULL," +
+                            "good_answer varchar(100) NOT NULL," +
+                            "bad_answer1 varchar(100) NOT NULL," +
+                            "bad_answer2 varchar(100) NOT NULL," +
+                            "bad_answer3 varchar(100) NOT NULL," +
+                            "user_added int(1) NOT NULL)";
+                        command.ExecuteNonQuery();
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS users " +
+                            "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "username varchar(100) NOT NULL," +
+                            "passwd varchar(255) NOT NULL)";
+                        command.ExecuteNonQuery();
+                    }
+                    connection.Close();
+                }
+            }
         }
+        
     }
 
     public void RunQuery(InputField inputField)
     {
         outputField.text = "";
         string query = inputField.text;
-        using (SqliteConnection connection = new SqliteConnection(filePath))
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
@@ -75,7 +99,7 @@ public class DatabaseManager : MonoBehaviour
     public void RunQuery(string input)
     {
         
-        using (SqliteConnection connection = new SqliteConnection(filePath))
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
@@ -96,7 +120,7 @@ public class DatabaseManager : MonoBehaviour
     {
         string[] dat = new string[5];
 
-        using (SqliteConnection connection = new SqliteConnection(filePath))
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())

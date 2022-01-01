@@ -4,7 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class DroneController : MonoBehaviour
+public class DroneController : MonoBehaviour, ISaveable
 {
 
     [SerializeField] private float speedMultiplier;
@@ -43,6 +43,11 @@ public class DroneController : MonoBehaviour
                 iFace.Click(this);
             }
         }
+    }
+
+    public void Startup()
+    {
+        
     }
 
     // Start is called before the first frame update
@@ -111,5 +116,22 @@ public class DroneController : MonoBehaviour
     private void OnDisable()
     {
         controls.Disable();
+    }
+
+    public void AddToSave(SaveData saveData)
+    {
+        SaveData.DroneData data = new SaveData.DroneData();
+        data.position = new float[] { transform.position.x, transform.position.y, transform.position.z};
+        saveData.droneData = data;
+    }
+
+    public void LoadFromSave(SaveData saveData)
+    {
+        transform.position = new Vector3(saveData.droneData.position[0], saveData.droneData.position[1], saveData.droneData.position[2]);
+    }
+
+    public UnityEngine.Object GetObject(bool force = false)
+    {
+        return null;
     }
 }
