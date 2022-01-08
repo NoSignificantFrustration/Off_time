@@ -1,0 +1,20 @@
+GameDB
+
+questions:
+	CREATE TABLE "questions" (
+	"id"	INTEGER,
+	"difficulty"	int(1) NOT NULL,
+	"question"	varchar(255) NOT NULL,
+	"good_answer"	varchar(100) NOT NULL,
+	"bad_answer1"	varchar(100) NOT NULL,
+	"bad_answer2"	varchar(100) NOT NULL,
+	"bad_answer3"	varchar(100) NOT NULL,
+	"user_added"	INTEGER(1) NOT NULL DEFAULT 0,
+	PRIMARY KEY("id" AUTOINCREMENT)
+)
+
+users: 
+	CREATE TABLE users (
+	id INTEGER PRIMARY KEY AUTOINCREMENT,
+	username varchar(100) NOT NULL,
+	passwd varchar(255) NOT NULL)

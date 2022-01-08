@@ -18,20 +18,20 @@ public class QuizHandler : MonoBehaviour
 
     public void StartQuiz()
     {
-        string[] dats = databaseManager.GetQuestion();
+        QuizData dats = databaseManager.GetQuestion();
 
-        questionText.text = dats[0];
+        questionText.text = dats.question;
 
         List<int> numList = new List<int>() { 0, 1, 2, 3 };
 
         rightAnswer = Random.Range(0, 4);
         numList.Remove(rightAnswer);
-        answerButtons[rightAnswer].GetComponentInChildren<Text>().text = dats[1];
-        for (int i = 2; i <= 4; i++)
+        answerButtons[rightAnswer].GetComponentInChildren<Text>().text = dats.good_answer;
+        for (int i = 0; i < 3; i++)
         {
             int buttonIndex = numList[Random.Range(0, numList.Count)];
             numList.Remove(buttonIndex);
-            answerButtons[buttonIndex].GetComponentInChildren<Text>().text = dats[i];
+            answerButtons[buttonIndex].GetComponentInChildren<Text>().text = dats.bad_answers[i];
             
         }
 
@@ -47,5 +47,12 @@ public class QuizHandler : MonoBehaviour
         {
             uiEventHandler.FinishQuiz(false);
         }
+    }
+
+    public struct QuizData
+    {
+        public string question;
+        public string good_answer;
+        public string[] bad_answers;
     }
 }

@@ -115,10 +115,11 @@ public class DatabaseManager : MonoBehaviour
 
     }
 
+    
 
-    public string[] GetQuestion()
+    public QuizHandler.QuizData GetQuestion()
     {
-        string[] dat = new string[5];
+        QuizHandler.QuizData dat;
 
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
@@ -133,12 +134,14 @@ public class DatabaseManager : MonoBehaviour
 
                     reader.Read();
 
-                    dat[0] = reader["question"].ToString();
-                    dat[1] = reader["good_answer"].ToString();
-                    dat[2] = reader["bad_answer1"].ToString();
-                    dat[3] = reader["bad_answer2"].ToString();
-                    dat[4] = reader["bad_answer3"].ToString();
+                    dat.question = reader["question"].ToString();
+                    dat.good_answer = reader["good_answer"].ToString();
+                    dat.bad_answers = new string[3];
+                    dat.bad_answers[0] = reader["bad_answer1"].ToString();
+                    dat.bad_answers[1] = reader["bad_answer2"].ToString();
+                    dat.bad_answers[2] = reader["bad_answer3"].ToString();
                     reader.Close();
+
                 }
 
             }
@@ -146,6 +149,116 @@ public class DatabaseManager : MonoBehaviour
         }
         return dat;
     }
+
+    public bool RegisterUser(string username, string password)
+    {
+        bool alreadyExists;
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT COUNT(*) AS 'count' FROM users WHERE username='" + username +"'" ;
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+
+                    reader.Read();
+                    if (Int32.Parse(reader["count"].ToString()) > 0)
+                    {
+                        alreadyExists = true;
+                        reader.Close();
+                    }
+                    else
+                    {
+                        reader.Close();
+                        alreadyExists = false;
+                        command.CommandText = "INSERT INTO users (username, passwd) VALUES " +
+                            "('" + username + "', '" + password + "')";
+                        command.ExecuteNonQuery();
+                    }
+                    
+                    
+
+                }
+
+            }
+            connection.Close();
+        }
+        return !alreadyExists;
+    }
+
+    public bool Login(string username, string password, out int userID, out string uname)
+    {
+
+        bool success;
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = "SELECT id, username, COUNT(*) AS count FROM users WHERE username = '" + username + "' AND passwd = '" + password + "'";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+
+                    reader.Read();
+                    if (Int32.Parse(reader["count"].ToString()) > 0)
+                    {
+                        success = true;
+                        userID = Int32.Parse(reader["id"].ToString());
+                        uname = reader["username"].ToString();
+                    }
+                    else
+                    {
+                        success = false;
+                        userID = 0;
+                        uname = "";
+                    }
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
+        return success;
+    }
+
+    //public string[] GetQuestion()
+    //{
+    //    string[] dat = new string[5];
+
+    //    using (SqliteConnection connection = new SqliteConnection(connectionPath))
+    //    {
+    //        connection.Open();
+    //        using (SqliteCommand command = connection.CreateCommand())
+    //        {
+    //            command.CommandText = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 1";
+    //            command.ExecuteNonQuery();
+
+    //            using (IDataReader reader = command.ExecuteReader())
+    //            {
+
+    //                reader.Read();
+
+    //                dat[0] = reader["question"].ToString();
+    //                dat[1] = reader["good_answer"].ToString();
+    //                dat[2] = reader["bad_answer1"].ToString();
+    //                dat[3] = reader["bad_answer2"].ToString();
+    //                dat[4] = reader["bad_answer3"].ToString();
+    //                reader.Close();
+
+    //            }
+
+    //        }
+    //        connection.Close();
+    //    }
+    //    return dat;
+    //}
+
+
 
 
     public void ChangeText(InputField inputField)

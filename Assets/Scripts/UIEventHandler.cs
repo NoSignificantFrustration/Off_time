@@ -31,7 +31,12 @@ public class UIEventHandler : MonoBehaviour
     public void Escape(InputAction.CallbackContext obj)
     {
 
-
+        CloseMenu();
+        
+  
+    }
+    public void CloseMenu()
+    {
         if (currentUI == null || currentUI == pauseMenu)
         {
             Pause();
@@ -48,11 +53,11 @@ public class UIEventHandler : MonoBehaviour
                 return;
             }
             currentUI.SetActive(false);
-            
-            
+
+
         }
-        
-        
+
+
         if (uiStack.Count > 0)
         {
             currentUI = uiStack.Pop();
@@ -62,7 +67,6 @@ public class UIEventHandler : MonoBehaviour
         {
             currentUI = null;
         }
-  
     }
 
     public void Pause()
