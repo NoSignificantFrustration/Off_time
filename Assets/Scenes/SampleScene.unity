@@ -7026,7 +7026,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4149687391964827869, guid: 84df671f0e984024e856dfc0b3c2a380, type: 3}
       propertyPath: uid
-      value: d91f1fc4-73ac-4d4f-80e4-a75c324146ed
+      value: 146edfc4-73ac-4d4f-80e4-a75c324146ed
       objectReference: {fileID: 0}
     - target: {fileID: 4149687391964827869, guid: 84df671f0e984024e856dfc0b3c2a380, type: 3}
       propertyPath: isLocked

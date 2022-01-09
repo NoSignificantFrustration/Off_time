@@ -24,7 +24,10 @@ public class UIEventHandler : MonoBehaviour
         uiStack = new Stack<GameObject>();
         currentUI = null;
         controls = new PlayerInputAsset();
-        controls.UI.Pause.performed += Escape;
+        if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
+        {
+            controls.UI.Pause.performed += Escape;
+        }
         isPaused = false;
     }
 
@@ -133,7 +136,7 @@ public class UIEventHandler : MonoBehaviour
         quizHandler.StartQuiz();
         OpenMenu(quizMenu);
     }
-
+    
     public void FinishQuiz(bool result)
     {
         
