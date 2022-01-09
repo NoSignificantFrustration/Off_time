@@ -69,12 +69,14 @@ public class GameController : MonoBehaviour
         {
             item.AddToSave(sd);
         }
-        FileManager.WriteToFile("save.test", sd);
+        PlaySession.currentSave = PlaySession.username + ".test";
+        FileManager.WriteToFile(PlaySession.currentSave, sd);
     }
 
     public void Load()
     {
         SaveData sd;
+        PlaySession.currentSave = PlaySession.username + ".test";
         if (FileManager.LoadFromFile(PlaySession.currentSave, out object result))
         {
             //sd.LoadFromJson(result);

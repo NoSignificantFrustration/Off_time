@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -25,6 +26,7 @@ public class MainMenuManager : MonoBehaviour
         eventHandler.OpenMenu(loginMenu);
         if (PlaySession.userID > 0)
         {
+            usernameText.text = PlaySession.username;
             eventHandler.OpenMenu(mainMenu);
         }
         for (int i = 0; i < registerFeedbackTexts.Length; i++)
@@ -48,6 +50,8 @@ public class MainMenuManager : MonoBehaviour
     {
         bool ready = true;
 
+        Regex rgx = new Regex("[^A-Za-z0-9]");
+
         for (int i = 0; i < 3; i++)
         {
             if (registerFields[i].text.Equals("") || registerFields[i].text == null)
@@ -57,6 +61,14 @@ public class MainMenuManager : MonoBehaviour
                 registerFeedbackRects[i].color = Color.red;
                 registerFeedbackTexts[i].text = "Ezt a mezõt kötelezõ kitölteni";
 
+            }
+            else if (rgx.IsMatch(registerFields[i].text))
+            {
+                ready = false;
+                registerFeedbackRects[i].gameObject.SetActive(true);
+                registerFeedbackRects[i].color = Color.red;
+                registerFeedbackTexts[i].text = "Nem tartalmazhat speciális karaktert";
+                registerFeedbackRects[3].gameObject.SetActive(false);
             }
             else
             {
@@ -128,6 +140,8 @@ public class MainMenuManager : MonoBehaviour
 
         bool ready = true;
 
+        Regex rgx = new Regex("[^A-Za-z0-9]");
+
         for (int i = 0; i < 2; i++)
         {
             if (loginFields[i].text.Equals(""))
@@ -136,6 +150,14 @@ public class MainMenuManager : MonoBehaviour
                 loginFeedbackRects[i].gameObject.SetActive(true);
                 loginFeedbackRects[i].color = Color.red;
                 loginFeedbackTexts[i].text = "Ezt a mezõt kötelezõ kitölteni";
+            }
+            else if (rgx.IsMatch(loginFields[i].text))
+            {
+                ready = false;
+                loginFeedbackRects[i].gameObject.SetActive(true);
+                loginFeedbackRects[i].color = Color.red;
+                loginFeedbackTexts[i].text = "Nem tartalmazhat speciális karaktert";
+                loginFeedbackRects[2].gameObject.SetActive(false);
             }
             else
             {
@@ -154,6 +176,7 @@ public class MainMenuManager : MonoBehaviour
             {
                 PlaySession.userID = userID;
                 PlaySession.username = uname;
+                //PlaySession.currentSave = uname + ".test";
                 usernameText.text = "Bejelentkezve " + PlaySession.username + " néven.";
                 for (int i = 0; i < loginFields.Length; i++)
                 {

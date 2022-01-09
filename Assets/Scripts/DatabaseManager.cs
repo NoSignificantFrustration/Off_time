@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -141,7 +142,7 @@ public class DatabaseManager : MonoBehaviour
                     dat.bad_answers[1] = reader["bad_answer2"].ToString();
                     dat.bad_answers[2] = reader["bad_answer3"].ToString();
                     reader.Close();
-
+                    
                 }
 
             }
@@ -152,6 +153,9 @@ public class DatabaseManager : MonoBehaviour
 
     public bool RegisterUser(string username, string password)
     {
+
+        username = Regex.Escape(username); //Replace(username, @"[\r\n\x00\x1a\\'""]", @"\$0");
+        password = Regex.Escape(password); //Replace(password, @"[\r\n\x00\x1a\\'""]", @"\$0");
         bool alreadyExists;
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
@@ -192,7 +196,10 @@ public class DatabaseManager : MonoBehaviour
     public bool Login(string username, string password, out int userID, out string uname)
     {
 
-        bool success;
+        username = Regex.Escape(username); //Replace(username, @"[\r\n\x00\x1a\\'""]", @"\$0");
+        password = Regex.Escape(password); //Replace(password, @"[\r\n\x00\x1a\\'""]", @"\$0");
+
+        bool success = false;
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
             connection.Open();

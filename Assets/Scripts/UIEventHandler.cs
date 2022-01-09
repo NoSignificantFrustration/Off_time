@@ -145,7 +145,7 @@ public class UIEventHandler : MonoBehaviour
 
     public void LoadFromSave()
     {
-        PlaySession.currentSave = "save.test";
+        PlaySession.currentSave = PlaySession.username + ".test";
         SwitchScene("SampleScene");
     }
 
