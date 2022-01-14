@@ -19,6 +19,18 @@ users:
 	username varchar(100) NOT NULL,
 	passwd varchar(255) NOT NULL)
 	
+saves:
+	CREATE TABLE saves (id INTEGER PRIMARY KEY AUTOINCREMENT,
+	userID INTEGER NOT NULL,
+	title VARCHAR(32) NOT NULL,
+	difficulty INTEGER(1) NOT NULL,
+	moves INTEGER NOT NULL,
+	levelName VARCHAR NOT NULL,
+	fileName VARCHAR NOT NULL,
+	elapsedTime FLOAT NOT NULL,
+	savetime DATETIME NOT NULL,
+	FOREIGN KEY (userID) REFERENCES users(id))
+	
 	
 	
 	

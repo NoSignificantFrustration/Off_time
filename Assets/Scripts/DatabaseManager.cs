@@ -36,10 +36,6 @@ public class DatabaseManager : MonoBehaviour
             if (File.Exists(backupPath))
             {
                 File.Copy(backupPath, filePath);
-            }
-            else
-            {
-                Debug.LogError("Database is missing");
                 using (SqliteConnection connection = new SqliteConnection(connectionPath))
                 {
                     connection.Open();
@@ -60,9 +56,26 @@ public class DatabaseManager : MonoBehaviour
                             "username varchar(100) NOT NULL," +
                             "passwd varchar(255) NOT NULL)";
                         command.ExecuteNonQuery();
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS saves " +
+                            "(id INTEGER PRIMARY KEY AUTOINCREMENT," +
+                            "userID INTEGER NOT NULL," +
+                            "title VARCHAR(32) NOT NULL," +
+                            "difficulty INTEGER(1) NOT NULL," +
+                            "moves INTEGER NOT NULL," +
+                            "levelName VARCHAR NOT NULL," +
+                            "fileName VARCHAR NOT NULL," +
+                            "elapsedTime FLOAT NOT NULL," +
+                            "savetime DATETIME NOT NULL," +
+                            "FOREIGN KEY (userID) REFERENCES users(id))";
+                        command.ExecuteNonQuery();
                     }
                     connection.Close();
                 }
+            }
+            else
+            {
+                Debug.LogError("Database is missing");
+                
             }
         }
         
@@ -221,8 +234,8 @@ public class DatabaseManager : MonoBehaviour
                     else
                     {
                         success = false;
-                        userID = 0;
-                        uname = "";
+                        userID = new int();
+                        uname = null;
                     }
                     reader.Close();
                 }
@@ -233,39 +246,33 @@ public class DatabaseManager : MonoBehaviour
         return success;
     }
 
-    //public string[] GetQuestion()
-    //{
-    //    string[] dat = new string[5];
+    public List<SaveGameInfo> GetSavedGames()
+    {
+        List<SaveGameInfo> saveGameInfos = new List<SaveGameInfo>();
 
-    //    using (SqliteConnection connection = new SqliteConnection(connectionPath))
-    //    {
-    //        connection.Open();
-    //        using (SqliteCommand command = connection.CreateCommand())
-    //        {
-    //            command.CommandText = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 1";
-    //            command.ExecuteNonQuery();
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"SELECT * ";
+                command.ExecuteNonQuery();
 
-    //            using (IDataReader reader = command.ExecuteReader())
-    //            {
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        SaveGameInfo saveInfo = new SaveGameInfo();
+                    }
+                    reader.Close();
+                }
 
-    //                reader.Read();
+            }
+            connection.Close();
+        }
 
-    //                dat[0] = reader["question"].ToString();
-    //                dat[1] = reader["good_answer"].ToString();
-    //                dat[2] = reader["bad_answer1"].ToString();
-    //                dat[3] = reader["bad_answer2"].ToString();
-    //                dat[4] = reader["bad_answer3"].ToString();
-    //                reader.Close();
-
-    //            }
-
-    //        }
-    //        connection.Close();
-    //    }
-    //    return dat;
-    //}
-
-
+        return saveGameInfos;
+    }
 
 
     public void ChangeText(InputField inputField)

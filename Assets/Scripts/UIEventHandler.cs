@@ -107,6 +107,22 @@ public class UIEventHandler : MonoBehaviour
         Application.Quit();
     }
 
+    public void ExitToMainMenu()
+    {
+        PlaySession.isInGame = false;
+        SwitchScene("MainMenu");
+    }
+
+    public void OpenSaveMenu(GameObject saveSelector)
+    {
+        DynamicListManager listManager = saveSelector.transform.GetComponentInChildren<DynamicListManager>();
+
+        if (listManager != null)
+        {
+            Debug.Log("Gottem");
+        }
+    }
+
     public void OpenMenu(GameObject menu)
     {
         
@@ -148,13 +164,15 @@ public class UIEventHandler : MonoBehaviour
 
     public void LoadFromSave()
     {
-        PlaySession.currentSave = PlaySession.username + ".test";
+        PlaySession.saveFileName = PlaySession.username + ".test";
+        PlaySession.isInGame = true;
         SwitchScene("SampleScene");
     }
 
     public void StartNewGame()
     {
-        PlaySession.currentSave = null;
+        PlaySession.saveFileName = null;
+        PlaySession.isInGame = true;
         SwitchScene("SampleScene");
     }
 

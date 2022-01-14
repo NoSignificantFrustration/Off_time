@@ -4,7 +4,10 @@ using UnityEngine;
 
 public static class PlaySession
 {
-    public static int userID = 0;
-    public static string username = "";
-    public static string currentSave = "";
+    public static int userID;
+    public static string username;
+    public static string saveFileName;
+    public static int difficulty;
+    public static string levelName;
+    public static bool isInGame;
 }

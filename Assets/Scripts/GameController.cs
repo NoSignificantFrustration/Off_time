@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
         FileManager.SetupDirs();
         CollectSaveables();
 
-        if (PlaySession.currentSave != null)
+        if (PlaySession.saveFileName != null)
         {
             Load();
         }
@@ -69,15 +69,15 @@ public class GameController : MonoBehaviour
         {
             item.AddToSave(sd);
         }
-        PlaySession.currentSave = PlaySession.username + ".test";
-        FileManager.WriteToFile(PlaySession.currentSave, sd);
+        PlaySession.saveFileName = PlaySession.username + ".test";
+        FileManager.WriteToFile(PlaySession.saveFileName, sd);
     }
 
     public void Load()
     {
         SaveData sd;
-        PlaySession.currentSave = PlaySession.username + ".test";
-        if (FileManager.LoadFromFile(PlaySession.currentSave, out object result))
+        PlaySession.saveFileName = PlaySession.username + ".test";
+        if (FileManager.LoadFromFile(PlaySession.saveFileName, out object result))
         {
             //sd.LoadFromJson(result);
             sd = (SaveData)result;
