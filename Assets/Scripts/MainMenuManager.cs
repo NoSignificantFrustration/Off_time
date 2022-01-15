@@ -23,7 +23,7 @@ public class MainMenuManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        //eventHandler.OpenMenu(loginMenu);
+        eventHandler.OpenMenu(loginMenu);
         if (PlaySession.userID > 0)
         {
             usernameText.text = PlaySession.username;

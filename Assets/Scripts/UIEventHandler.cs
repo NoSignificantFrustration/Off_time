@@ -13,6 +13,7 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private GameObject pauseMenu;
     [SerializeField] private GameObject quizMenu;
     [SerializeField] private QuizHandler quizHandler;
+    [SerializeField] private GameObject saveLoadMenu;
     private PlayerInputAsset controls;
     private Stack<GameObject> uiStack;
     private GameObject currentUI;
@@ -113,14 +114,12 @@ public class UIEventHandler : MonoBehaviour
         SwitchScene("MainMenu");
     }
 
-    public void OpenSaveMenu(GameObject saveSelector)
+    public void OpenSaveLoadMenu(int listType)
     {
-        DynamicListManager listManager = saveSelector.transform.GetComponentInChildren<DynamicListManager>();
-
-        if (listManager != null)
-        {
-            Debug.Log("Gottem");
-        }
+        DynamicListManager listManager = saveLoadMenu.transform.GetComponentInChildren<DynamicListManager>();
+        OpenMenu(saveLoadMenu);
+        listManager.ReloadList((DynamicListManager.DynamicListType)listType);
+        
     }
 
     public void OpenMenu(GameObject menu)

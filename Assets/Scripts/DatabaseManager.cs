@@ -3,6 +3,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -23,6 +24,7 @@ public class DatabaseManager : MonoBehaviour
     private void Start()
     {
         SetupDB();
+        Debug.Log(DateTime.Now);
     }
 
     private void SetupDB()
@@ -255,7 +257,7 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT * ";
+                command.CommandText = $"SELECT id, title, difficulty, levelName, fileName, moves, CAST(savetime AS nvarchar(10)) AS 'savetime', elapsedTime FROM saves WHERE userID = '{PlaySession.userID}'";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())
@@ -263,6 +265,16 @@ public class DatabaseManager : MonoBehaviour
                     while (reader.Read())
                     {
                         SaveGameInfo saveInfo = new SaveGameInfo();
+                        saveInfo.saveID = int.Parse(reader["id"].ToString());
+                        saveInfo.saveTitle = reader["title"].ToString();
+                        saveInfo.difficulty = int.Parse(reader["difficulty"].ToString());
+                        saveInfo.levelName = reader["levelName"].ToString();
+                        saveInfo.fileName = reader["fileName"].ToString();
+                        saveInfo.moves = int.Parse(reader["moves"].ToString());
+                        saveInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "MM-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                        saveInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString());
+                        saveGameInfos.Add(saveInfo);
+                        //"MM/dd/yyyy HH:mm:ss"
                     }
                     reader.Close();
                 }
