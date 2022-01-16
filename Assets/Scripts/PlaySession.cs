@@ -9,5 +9,7 @@ public static class PlaySession
     public static string saveFileName;
     public static int difficulty;
     public static string levelName;
-    public static bool isInGame;
+    public static int moves;
+    public static float elapsedTime;
+    
 }

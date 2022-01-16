@@ -70,26 +70,26 @@ public class GameController : MonoBehaviour
             item.AddToSave(sd);
         }
         PlaySession.saveFileName = PlaySession.username + ".test";
-        FileManager.WriteToFile(PlaySession.saveFileName, sd);
+        //FileManager.WriteToFile(PlaySession.saveFileName, sd);
     }
 
     public void Load()
     {
-        SaveData sd;
-        PlaySession.saveFileName = PlaySession.username + ".test";
-        if (FileManager.LoadFromFile(PlaySession.saveFileName, out object result))
-        {
-            //sd.LoadFromJson(result);
-            sd = (SaveData)result;
-            foreach (ISaveable item in saveables)
-            {
-                item.LoadFromSave(sd);
-            }
-        }
-        else
-        {
-            Debug.LogError("Load failed");
-        }
+        //SaveData sd;
+        //PlaySession.saveFileName = PlaySession.username + ".test";
+        //if (FileManager.LoadFromFile(PlaySession.saveFileName, out object result))
+        //{
+        //    //sd.LoadFromJson(result);
+        //    sd = (SaveData)result;
+        //    foreach (ISaveable item in saveables)
+        //    {
+        //        item.LoadFromSave(sd);
+        //    }
+        //}
+        //else
+        //{
+        //    Debug.LogError("Load failed");
+        //}
 
     }
 }

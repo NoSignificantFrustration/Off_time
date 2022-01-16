@@ -1,6 +1,4 @@
 using System;
-using System.Collections;
-using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using UnityEngine;
@@ -14,17 +12,36 @@ public static class FileManager
         Directory.CreateDirectory(saveDirectory);
     }
 
-    public static bool WriteToFile(string a_FileName, object a_FileContents)
+    public static bool WriteToFile(string folderPath, string preferredFileName, string extension, object fileContents, bool overWrite, out string actualFileName)
     {
-        var fullPath = Path.Combine(saveDirectory, a_FileName);
-        
+        string fullPath = Path.Combine(folderPath, preferredFileName + extension);
+
+        if (File.Exists(fullPath))
+        {
+            if (overWrite)
+            {
+                actualFileName = preferredFileName;
+            }
+            else
+            {
+                int i = 0;
+                do
+                {
+                    actualFileName = preferredFileName + $"({i})";
+                    fullPath = Path.Combine(folderPath, actualFileName + extension);
+                } while (File.Exists(fullPath));
+            }
+        }
+        else
+        {
+            actualFileName = preferredFileName;
+        }
 
         try
         {
-            //File.WriteAllText(fullPath, a_FileContents);
             BinaryFormatter formatter = new BinaryFormatter();
             FileStream fs = new FileStream(fullPath, FileMode.Create);
-            formatter.Serialize(fs, a_FileContents);
+            formatter.Serialize(fs, fileContents);
             fs.Close();
             return true;
         }
@@ -35,9 +52,9 @@ public static class FileManager
         }
     }
 
-    public static bool LoadFromFile(string a_FileName, out object result)
+    public static bool LoadFromFile(string folderPath, string fileName, string extension, out object result)
     {
-        var fullPath = Path.Combine(saveDirectory, a_FileName);
+        var fullPath = Path.Combine(folderPath, fileName);
 
         try
         {
@@ -56,7 +73,7 @@ public static class FileManager
                 return false;
             }
             //result = File.ReadAllText(fullPath);
-            
+
         }
         catch (Exception e)
         {

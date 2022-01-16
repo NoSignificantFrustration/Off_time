@@ -6,6 +6,7 @@ using UnityEngine.UI;
 public class DynamicListManager : MonoBehaviour
 {
     [SerializeField] private GameController gameController;
+    [SerializeField] private UIEventHandler uiEventHandler;
     [SerializeField] private DatabaseManager databaseManager;
     [SerializeField] private GameObject buttonPrefab;
     [SerializeField] private int btnAmount;
@@ -14,8 +15,14 @@ public class DynamicListManager : MonoBehaviour
     [SerializeField] private GameObject header;
     [SerializeField] private int headerFontSize;
     [SerializeField] private int listFontSize;
+    [SerializeField] private GameObject confirmationPanel;
+    [SerializeField] private Text[] confirmationTexts = new Text[2];
+    [SerializeField] private Button confirmPanelButton;
+    [SerializeField] private GameObject feedbackPanel;
+    [SerializeField] private Text[] feedbackTexts = new Text[2];
+    [SerializeField] private Button feedbackPanelButton;
     [SerializeField] private GameObject newSavePanel;
-    [SerializeField] private GameObject overwriteSavePanel;
+    [SerializeField] private GameObject saveFeedbackRect;
     [SerializeField] private GameObject chooseButton;
     [SerializeField] private ColorBlock selectedColorBlock;
     private ColorBlock normalColorBlock;
@@ -89,16 +96,17 @@ public class DynamicListManager : MonoBehaviour
             Destroy(content.transform.GetChild(i).gameObject);
         }
 
+        Button chooseButtonComp = chooseButton.GetComponent<Button>();
+
 
         switch (listType)
         {
             case DynamicListType.SaveList:
 
                 chooseButton.GetComponentInChildren<Text>().text = "Mentés";
-                Button chooseButtonComp = chooseButton.GetComponent<Button>();
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
-                chooseButtonComp.onClick.AddListener(delegate { OverwriteSelectedSave(); });
+                chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
                 GameObject newSaveButton = CreateListMember();
                 Button newSaveButtonComponent = newSaveButton.GetComponent<Button>();
@@ -123,8 +131,12 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.LoadList:
 
                 chooseButton.GetComponentInChildren<Text>().text = "Betöltés";
+                chooseButtonComp.onClick.RemoveAllListeners();
+                chooseButtonComp.interactable = false;
+                chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
-                for (int i = 0; i < btnAmount; i++)
+                saveGameInfos = databaseManager.GetSavedGames();
+                for (int i = 0; i < saveGameInfos.Count; i++)
                 {
                     GameObject button = CreateListMember();
 
@@ -199,7 +211,7 @@ public class DynamicListManager : MonoBehaviour
                 break;
             case DynamicListType.LoadList:
 
-                listMemberText = new ListMemberText(saveGameInfos[listMemberButtons.Count]);
+                listMemberText = new ListMemberText(saveGameInfos[index]);
 
                 for (int i = 0; i < headerProperty.textFields.Length; i++)
                 {
@@ -238,33 +250,72 @@ public class DynamicListManager : MonoBehaviour
 
     private void ListElementPressed(GameObject clickedButton)
     {
-        chooseButton.GetComponent<Button>().interactable = true;
 
-        if (clickedButton == selectedButton)
+        switch (listType)
         {
-            if (Time.time - lastClickTime <= 0.5f)
-            {
-                OverwriteSelectedSave();
-                //Debug.Log("DoubleClick");
-            }
+            case DynamicListType.SaveList:
+                chooseButton.GetComponent<Button>().interactable = true;
 
+                if (clickedButton == selectedButton)
+                {
+                    if (Time.time - lastClickTime <= 0.5f)
+                    {
+                        ChooseButtonClicked();
+                        //Debug.Log("DoubleClick");
+                    }
+
+                }
+                else
+                {
+
+
+                    Button clickedButtonComp = clickedButton.GetComponent<Button>();
+
+                    if (selectedButton != null)
+                    {
+                        Button selectedButtonComp = selectedButton.GetComponent<Button>();
+                        selectedButtonComp.colors = normalColorBlock;
+                    }
+
+                    clickedButtonComp.colors = selectedColorBlock;
+
+                    selectedButton = clickedButton;
+                }
+                break;
+            case DynamicListType.LoadList:
+                chooseButton.GetComponent<Button>().interactable = true;
+
+                if (clickedButton == selectedButton)
+                {
+                    if (Time.time - lastClickTime <= 0.5f)
+                    {
+                        ChooseButtonClicked();
+                        //Debug.Log("DoubleClick");
+                    }
+
+                }
+                else
+                {
+
+
+                    Button clickedButtonComp = clickedButton.GetComponent<Button>();
+
+                    if (selectedButton != null)
+                    {
+                        Button selectedButtonComp = selectedButton.GetComponent<Button>();
+                        selectedButtonComp.colors = normalColorBlock;
+                    }
+
+                    clickedButtonComp.colors = selectedColorBlock;
+
+                    selectedButton = clickedButton;
+                }
+                break;
+            default:
+                break;
         }
-        else
-        {
 
 
-            Button clickedButtonComp = clickedButton.GetComponent<Button>();
-
-            if (selectedButton != null)
-            {
-                Button selectedButtonComp = selectedButton.GetComponent<Button>();
-                selectedButtonComp.colors = normalColorBlock;
-            }
-
-            clickedButtonComp.colors = selectedColorBlock;
-
-            selectedButton = clickedButton;
-        }
         lastClickTime = Time.time;
     }
 
@@ -281,10 +332,16 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.SaveList:
                 if (selectedButton != null)
                 {
-                    OverwriteSelectedSave();
+                    confirmationTexts[0].text = "Mentés";
+                    confirmationTexts[1].text = "Biztosan felülírod a kiválasztott mentést?\n(Ez a mûvelet nem fordítható vissza)";
+                    confirmPanelButton.GetComponentInChildren<Text>().text = "Felülírás";
+                    confirmPanelButton.onClick.RemoveAllListeners();
+                    confirmPanelButton.onClick.AddListener(delegate { OverwriteSelectedSave(); });
+                    confirmationPanel.SetActive(true);
                 }
                 break;
             case DynamicListType.LoadList:
+                Debug.Log("Load the save");
                 break;
             default:
                 break;
@@ -315,7 +372,22 @@ public class DynamicListManager : MonoBehaviour
 
     private void OverwriteSelectedSave()
     {
-        overwriteSavePanel.SetActive(true);
+        Debug.Log("Overwrite the save");
+        //TODO
+        confirmationPanel.SetActive(false);
+        feedbackTexts[0].text = "Mentés";
+        feedbackTexts[1].text = "Sikeres mentés";
+        feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+        feedbackPanelButton.onClick.RemoveAllListeners();
+        feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+        feedbackPanelButton.onClick.AddListener(delegate { uiEventHandler.CloseMenu(); });
+        feedbackPanel.SetActive(true);
+
+    }
+
+    private void LoadSelectedSave()
+    {
+        Debug.Log("Load the save");
     }
 
     // Update is called once per frame
@@ -331,7 +403,9 @@ public class DynamicListManager : MonoBehaviour
 
         public ListMemberText(SaveGameInfo saveGameInfo)
         {
-            textContents = new string[] { saveGameInfo.saveTitle, saveGameInfo.levelName, saveGameInfo.difficulty.ToString(), saveGameInfo.moves.ToString(), saveGameInfo.elapsedTime.ToString(), saveGameInfo.saveTime.ToString() };
+            TimeSpan time = TimeSpan.FromSeconds(saveGameInfo.elapsedTime);
+
+            textContents = new string[] { saveGameInfo.saveTitle, saveGameInfo.levelName, saveGameInfo.difficulty.ToString(), saveGameInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), saveGameInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
         }
 
     }

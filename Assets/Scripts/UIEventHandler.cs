@@ -110,7 +110,6 @@ public class UIEventHandler : MonoBehaviour
 
     public void ExitToMainMenu()
     {
-        PlaySession.isInGame = false;
         SwitchScene("MainMenu");
     }
 
@@ -164,14 +163,12 @@ public class UIEventHandler : MonoBehaviour
     public void LoadFromSave()
     {
         PlaySession.saveFileName = PlaySession.username + ".test";
-        PlaySession.isInGame = true;
         SwitchScene("SampleScene");
     }
 
     public void StartNewGame()
     {
         PlaySession.saveFileName = null;
-        PlaySession.isInGame = true;
         SwitchScene("SampleScene");
     }
 

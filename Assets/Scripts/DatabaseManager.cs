@@ -24,7 +24,7 @@ public class DatabaseManager : MonoBehaviour
     private void Start()
     {
         SetupDB();
-        Debug.Log(DateTime.Now);
+        //Debug.Log(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
     }
 
     private void SetupDB()
@@ -271,10 +271,10 @@ public class DatabaseManager : MonoBehaviour
                         saveInfo.levelName = reader["levelName"].ToString();
                         saveInfo.fileName = reader["fileName"].ToString();
                         saveInfo.moves = int.Parse(reader["moves"].ToString());
-                        saveInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "MM-dd-yyyy HH:mm:ss", CultureInfo.InvariantCulture);
+                        saveInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         saveInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString());
                         saveGameInfos.Add(saveInfo);
-                        //"MM/dd/yyyy HH:mm:ss"
+                        //"yyyy-MM-dd HH:mm:ss"
                     }
                     reader.Close();
                 }
@@ -284,6 +284,68 @@ public class DatabaseManager : MonoBehaviour
         }
 
         return saveGameInfos;
+    }
+
+    public bool CheckIfSaveNameTaken(string saveName)
+    {
+
+        saveName = Regex.Escape(saveName);
+
+        bool taken = false;
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"SELECT COUNT(*) AS count FROM saves WHERE title = '{saveName}'";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+
+                    reader.Read();
+                    if (Int32.Parse(reader["count"].ToString()) > 0)
+                    {
+                        taken = true;
+                    }
+                    else
+                    {
+                        taken = false;
+                    }
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
+        return taken;
+    }
+
+    public void AddSave(string saveName, string fileName)
+    {
+        saveName = Regex.Escape(saveName);
+        fileName = Regex.Escape(fileName);
+
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"INSERT INTO saves (userID, title, difficulty, moves, levelName, fileName, elapsedTime, savetime) VALUES" +
+                    $"('{PlaySession.userID}', '{saveName}', '{PlaySession.difficulty}', '{PlaySession.moves}', '{PlaySession.levelName}', '{fileName}', '{PlaySession.elapsedTime}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+
+                    reader.Read();
+                    
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
     }
 
 
