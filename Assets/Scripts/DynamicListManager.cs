@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -22,7 +23,9 @@ public class DynamicListManager : MonoBehaviour
     [SerializeField] private Text[] feedbackTexts = new Text[2];
     [SerializeField] private Button feedbackPanelButton;
     [SerializeField] private GameObject newSavePanel;
-    [SerializeField] private GameObject saveFeedbackRect;
+    [SerializeField] private InputField newSaveInput;
+    [SerializeField] private Image saveFeedbackRect;
+    private Text saveFeedbackText;
     [SerializeField] private GameObject chooseButton;
     [SerializeField] private ColorBlock selectedColorBlock;
     private ColorBlock normalColorBlock;
@@ -42,6 +45,7 @@ public class DynamicListManager : MonoBehaviour
         contentFitter = content.GetComponent<ContentSizeFitter>();
         normalColorBlock = buttonPrefab.GetComponent<Button>().colors;
         saveGameInfos = new List<SaveGameInfo>();
+        saveFeedbackText = saveFeedbackRect.GetComponentInChildren<Text>();
     }
 
     // Start is called before the first frame update
@@ -325,6 +329,62 @@ public class DynamicListManager : MonoBehaviour
         newSavePanel.SetActive(true);
     }
 
+    public void NewSave()
+    {
+        Regex rgx = new Regex("[^A-Za-z0-9]");
+        bool ready = true;
+
+        if (newSaveInput.text.Equals("") || newSaveInput.text == null)
+        {
+            ready = false;
+            saveFeedbackRect.gameObject.SetActive(true);
+            saveFeedbackRect.color = Color.red;
+            saveFeedbackText.text = "Ezt a mezõt kötelezõ kitölteni";
+
+        }
+        else if (rgx.IsMatch(newSaveInput.text))
+        {
+            ready = false;
+            saveFeedbackRect.gameObject.SetActive(true);
+            saveFeedbackRect.color = Color.red;
+            saveFeedbackText.text = "Nem tartalmazhat speciális karaktert";
+
+        }
+        else
+        {
+            saveFeedbackRect.gameObject.SetActive(false);
+
+
+            if (newSaveInput.text.Length < 3)
+            {
+                ready = false;
+                saveFeedbackRect.gameObject.SetActive(true);
+                saveFeedbackRect.color = Color.red;
+                saveFeedbackText.text = "Minimum 3 karakter";
+            }
+        }
+
+        if (ready)
+        {
+
+
+            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text))
+            {
+                saveFeedbackRect.gameObject.SetActive(true);
+                saveFeedbackRect.color = Color.red;
+                saveFeedbackText.text = "Már van egy ilyen nevû mentésed";
+            }
+            else
+            {
+                saveFeedbackRect.gameObject.SetActive(false);
+
+                // TODO
+                Debug.Log("Mentés");
+            }
+
+        }
+    }
+
     public void ChooseButtonClicked()
     {
         switch (listType)
@@ -341,6 +401,7 @@ public class DynamicListManager : MonoBehaviour
                 }
                 break;
             case DynamicListType.LoadList:
+                // TODO
                 Debug.Log("Load the save");
                 break;
             default:
@@ -374,6 +435,7 @@ public class DynamicListManager : MonoBehaviour
     {
         Debug.Log("Overwrite the save");
         //TODO
+        //Ha sikeres
         confirmationPanel.SetActive(false);
         feedbackTexts[0].text = "Mentés";
         feedbackTexts[1].text = "Sikeres mentés";
@@ -396,6 +458,10 @@ public class DynamicListManager : MonoBehaviour
         //Debug.Log(Screen.height / listMemberHeight);
     }
 
+    public void Close()
+    {
+        uiEventHandler.CloseMenu();
+    }
 
     public struct ListMemberText
     {
@@ -429,7 +495,7 @@ public class DynamicListManager : MonoBehaviour
                     defaultSortingMode = new bool[] { true, true, true, true, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
-                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleRight, TextAnchor.MiddleCenter };
+                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
                     break;
                 case DynamicListType.LoadList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
@@ -437,7 +503,7 @@ public class DynamicListManager : MonoBehaviour
                     defaultSortingMode = new bool[] { true, true, true, true, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
-                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleRight, TextAnchor.MiddleCenter };
+                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
                     break;
                 default:
                     colHeaderNames = new string[] { };

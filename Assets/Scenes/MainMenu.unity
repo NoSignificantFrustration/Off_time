@@ -422,6 +422,17 @@ Transform:
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &150554831 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 772252767890593165, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
+  m_PrefabInstance: {fileID: 772252767873136496}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7490e04522c40c74db91db27bed3e5d6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &165589240
 GameObject:
   m_ObjectHideFlags: 0
@@ -567,7 +578,7 @@ MonoBehaviour:
       m_Calls: []
   m_FontData:
     m_Font: {fileID: 10102, guid: 0000000000000000e000000000000000, type: 0}
-    m_FontSize: 60
+    m_FontSize: 40
     m_FontStyle: 0
     m_BestFit: 0
     m_MinSize: 2
@@ -1640,7 +1651,7 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
+          m_IntArgument: 1
           m_FloatArgument: 0
           m_StringArgument: SampleScene
           m_BoolArgument: 0
@@ -4734,7 +4745,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3379210167197077292, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_AnchoredPosition.x
-      value: 102.53381
+      value: 102.53369
       objectReference: {fileID: 0}
     - target: {fileID: 3379210167197077292, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_AnchoredPosition.y
@@ -5057,9 +5068,21 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 772252769457482117, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
+      propertyPath: m_AnchorMax.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 772252769457482117, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
+      propertyPath: m_AnchorMax.y
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5965217972827225463, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_Target
       value: 
-      objectReference: {fileID: 1770837655}
+      objectReference: {fileID: 150554831}
+    - target: {fileID: 5965217972827225463, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
+      propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: Close
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3adbed895bd033545833e82de87adb0f, type: 3}
