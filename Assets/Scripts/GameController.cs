@@ -3,7 +3,7 @@ using UnityEngine;
 
 public class GameController : MonoBehaviour
 {
-
+    [SerializeField] private DatabaseManager databaseManager;
     private static GameObject[] nodes;
     private static GameObject[] blockers;
     private static GameObject player;
@@ -17,7 +17,7 @@ public class GameController : MonoBehaviour
         FileManager.SetupDirs();
         CollectSaveables();
 
-        if (PlaySession.saveFileName != null)
+        if (PlaySession.saveInfo.fileName != null)
         {
             Load();
         }
@@ -62,34 +62,51 @@ public class GameController : MonoBehaviour
 
     }
 
-    public void Save()
+    public bool Save(string saveTitle, string fileName, bool overwrite)
     {
         SaveData sd = new SaveData();
         foreach (ISaveable item in saveables)
         {
             item.AddToSave(sd);
         }
-        PlaySession.saveFileName = PlaySession.username + ".test";
-        //FileManager.WriteToFile(PlaySession.saveFileName, sd);
+
+        if (overwrite)
+        {
+            return false;
+        }
+        else
+        {
+            if (FileManager.WriteToFile(FileManager.saveDirectory, fileName, ".save", sd, overwrite, out string actualFilename))
+            {
+                PlaySession.saveInfo.saveTitle = saveTitle;
+                PlaySession.saveInfo.fileName = actualFilename;
+                PlaySession.saveInfo.saveTime = System.DateTime.Now;
+                databaseManager.AddSave();
+                
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
     }
 
     public void Load()
     {
-        //SaveData sd;
-        //PlaySession.saveFileName = PlaySession.username + ".test";
-        //if (FileManager.LoadFromFile(PlaySession.saveFileName, out object result))
-        //{
-        //    //sd.LoadFromJson(result);
-        //    sd = (SaveData)result;
-        //    foreach (ISaveable item in saveables)
-        //    {
-        //        item.LoadFromSave(sd);
-        //    }
-        //}
-        //else
-        //{
-        //    Debug.LogError("Load failed");
-        //}
+        SaveData sd;
+        if (FileManager.LoadFromFile(FileManager.saveDirectory, PlaySession.saveInfo.fileName, ".save", out object result))
+        {
+            sd = (SaveData)result;
+            foreach (ISaveable item in saveables)
+            {
+                item.LoadFromSave(sd);
+            }
+        }
+        else
+        {
+            Debug.LogError("Load failed");
+        }
 
     }
 }

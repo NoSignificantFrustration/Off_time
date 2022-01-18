@@ -54,7 +54,7 @@ public static class FileManager
 
     public static bool LoadFromFile(string folderPath, string fileName, string extension, out object result)
     {
-        var fullPath = Path.Combine(folderPath, fileName);
+        var fullPath = Path.Combine(folderPath, fileName + extension);
 
         try
         {
@@ -72,7 +72,7 @@ public static class FileManager
                 result = null;
                 return false;
             }
-            //result = File.ReadAllText(fullPath);
+
 
         }
         catch (Exception e)

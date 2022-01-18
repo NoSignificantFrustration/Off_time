@@ -110,6 +110,8 @@ public class UIEventHandler : MonoBehaviour
 
     public void ExitToMainMenu()
     {
+        PlaySession.saveInfo.fileName = null;
+        PlaySession.saveInfo.levelName = null;
         SwitchScene("MainMenu");
     }
 
@@ -162,13 +164,13 @@ public class UIEventHandler : MonoBehaviour
 
     public void LoadFromSave()
     {
-        PlaySession.saveFileName = PlaySession.username + ".test";
+        // TODO
         SwitchScene("SampleScene");
     }
 
     public void StartNewGame()
     {
-        PlaySession.saveFileName = null;
+        PlaySession.saveInfo = new SaveGameInfo("SampleScene");
         SwitchScene("SampleScene");
     }
 

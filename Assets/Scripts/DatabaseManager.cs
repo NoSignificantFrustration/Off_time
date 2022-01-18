@@ -265,7 +265,6 @@ public class DatabaseManager : MonoBehaviour
                     while (reader.Read())
                     {
                         SaveGameInfo saveInfo = new SaveGameInfo();
-                        saveInfo.saveID = int.Parse(reader["id"].ToString());
                         saveInfo.saveTitle = reader["title"].ToString();
                         saveInfo.difficulty = int.Parse(reader["difficulty"].ToString());
                         saveInfo.levelName = reader["levelName"].ToString();
@@ -321,10 +320,8 @@ public class DatabaseManager : MonoBehaviour
         return taken;
     }
 
-    public void AddSave(string saveName, string fileName)
+    public void AddSave()
     {
-        saveName = Regex.Escape(saveName);
-        fileName = Regex.Escape(fileName);
 
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
@@ -332,17 +329,8 @@ public class DatabaseManager : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandText = $"INSERT INTO saves (userID, title, difficulty, moves, levelName, fileName, elapsedTime, savetime) VALUES" +
-                    $"('{PlaySession.userID}', '{saveName}', '{PlaySession.difficulty}', '{PlaySession.moves}', '{PlaySession.levelName}', '{fileName}', '{PlaySession.elapsedTime}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
+                    $"('{PlaySession.userID}', '{PlaySession.saveInfo.saveTitle}', '{PlaySession.saveInfo.difficulty}', '{PlaySession.saveInfo.moves}', '{PlaySession.saveInfo.levelName}', '{PlaySession.saveInfo.fileName}', '{PlaySession.saveInfo.elapsedTime}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
                 command.ExecuteNonQuery();
-
-                using (IDataReader reader = command.ExecuteReader())
-                {
-
-                    reader.Read();
-                    
-                    reader.Close();
-                }
-
             }
             connection.Close();
         }

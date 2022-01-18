@@ -378,8 +378,31 @@ public class DynamicListManager : MonoBehaviour
             {
                 saveFeedbackRect.gameObject.SetActive(false);
 
-                // TODO
-                Debug.Log("Mentés");
+
+                string saveName = newSaveInput.text;
+                if (gameController.Save(saveName, saveName, false))
+                {
+                    newSaveInput.text = "";
+                    newSavePanel.SetActive(false);
+
+                    feedbackTexts[0].text = "Mentés";
+                    feedbackTexts[1].text = "Sikeres mentés";
+                    feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+                    feedbackPanelButton.onClick.RemoveAllListeners();
+                    feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+                    feedbackPanelButton.onClick.AddListener(delegate { uiEventHandler.CloseMenu(); });
+                    feedbackPanel.SetActive(true);
+                }
+                else
+                {
+                    feedbackTexts[0].text = "Mentés";
+                    feedbackTexts[1].text = "Sikertelen mentés";
+                    feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+                    feedbackPanelButton.onClick.RemoveAllListeners();
+                    feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+                    feedbackPanel.SetActive(true);
+                }
+
             }
 
         }
@@ -401,8 +424,8 @@ public class DynamicListManager : MonoBehaviour
                 }
                 break;
             case DynamicListType.LoadList:
-                // TODO
-                Debug.Log("Load the save");
+                PlaySession.saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
+                uiEventHandler.SwitchScene(PlaySession.saveInfo.levelName);
                 break;
             default:
                 break;
@@ -447,10 +470,6 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
-    private void LoadSelectedSave()
-    {
-        Debug.Log("Load the save");
-    }
 
     // Update is called once per frame
     void Update()
@@ -528,8 +547,6 @@ public class DynamicListManager : MonoBehaviour
 
 public struct SaveGameInfo
 {
-    public int indexInList;
-    public int saveID;
     public string saveTitle;
     public int difficulty;
     public string levelName;
@@ -538,4 +555,14 @@ public struct SaveGameInfo
     public DateTime saveTime;
     public float elapsedTime;
 
+    public SaveGameInfo(string levelName)
+    {
+        saveTitle = null;
+        difficulty = 0;
+        this.levelName = levelName;
+        fileName = null;
+        moves = 0;
+        saveTime = new DateTime();
+        elapsedTime = 0f;
+    }
 }

@@ -199,7 +199,7 @@ public class MainMenuManager : MonoBehaviour
     {
         PlaySession.userID = new int();
         PlaySession.username = null;
-        PlaySession.saveFileName = null;
+        PlaySession.saveInfo.fileName = null;
         eventHandler.CloseMenu();
     }
 
