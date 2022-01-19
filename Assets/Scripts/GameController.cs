@@ -59,8 +59,14 @@ public class GameController : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
+        if (!UIEventHandler.isPaused)
+        {
+            PlaySession.saveInfo.elapsedTime += Time.deltaTime;
+        }
+        
     }
+
+ 
 
     public bool Save(string saveTitle, string fileName, bool overwrite)
     {
@@ -72,7 +78,21 @@ public class GameController : MonoBehaviour
 
         if (overwrite)
         {
-            return false;
+
+            if (FileManager.WriteToFile(FileManager.saveDirectory, fileName, ".save", sd, overwrite, out string actualFilename))
+            {
+                PlaySession.saveInfo.saveTitle = saveTitle;
+                PlaySession.saveInfo.fileName = actualFilename;
+                PlaySession.saveInfo.saveTime = System.DateTime.Now;
+                databaseManager.OverwriteSave();
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+            
         }
         else
         {

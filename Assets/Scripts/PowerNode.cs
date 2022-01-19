@@ -90,6 +90,8 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
             return;
         }
 
+        PlaySession.saveInfo.moves++;
+
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
         {
             //Debug.Log(sr.transform.localRotation);

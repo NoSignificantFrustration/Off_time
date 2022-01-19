@@ -70,6 +70,12 @@ public class DynamicListManager : MonoBehaviour
 
     private void SetupHeader()
     {
+
+        foreach (Transform child in header.transform)
+        {
+            GameObject.Destroy(child.gameObject);
+        }
+
         headerProperty = new ListHeaderProperty(listType);
         for (int i = 0; i < headerProperty.textFields.Length; i++)
         {
@@ -95,10 +101,12 @@ public class DynamicListManager : MonoBehaviour
 
     private void LoadButtons()
     {
-        for (int i = 0; i < content.transform.childCount; i++)
+        foreach (Transform child in content.transform)
         {
-            Destroy(content.transform.GetChild(i).gameObject);
+            GameObject.Destroy(child.gameObject);
         }
+
+
 
         Button chooseButtonComp = chooseButton.GetComponent<Button>();
 
@@ -155,10 +163,6 @@ public class DynamicListManager : MonoBehaviour
                 break;
         }
 
-        if (listType == DynamicListType.SaveList)
-        {
-
-        }
 
 
 
@@ -395,8 +399,8 @@ public class DynamicListManager : MonoBehaviour
                 }
                 else
                 {
-                    feedbackTexts[0].text = "Mentés";
-                    feedbackTexts[1].text = "Sikertelen mentés";
+                    feedbackTexts[0].text = "Hiba";
+                    feedbackTexts[1].text = "A mentés sikertelen";
                     feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
                     feedbackPanelButton.onClick.RemoveAllListeners();
                     feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
@@ -457,24 +461,35 @@ public class DynamicListManager : MonoBehaviour
     private void OverwriteSelectedSave()
     {
         Debug.Log("Overwrite the save");
-        //TODO
-        //Ha sikeres
-        confirmationPanel.SetActive(false);
-        feedbackTexts[0].text = "Mentés";
-        feedbackTexts[1].text = "Sikeres mentés";
-        feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
-        feedbackPanelButton.onClick.RemoveAllListeners();
-        feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
-        feedbackPanelButton.onClick.AddListener(delegate { uiEventHandler.CloseMenu(); });
-        feedbackPanel.SetActive(true);
+        SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
 
+        if (gameController.Save(saveInfo.saveTitle, saveInfo.fileName, true))
+        {
+            confirmationPanel.SetActive(false);
+            feedbackTexts[0].text = "Mentés";
+            feedbackTexts[1].text = "Sikeres mentés";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+            feedbackPanelButton.onClick.AddListener(delegate { uiEventHandler.CloseMenu(); });
+            feedbackPanel.SetActive(true);
+        }
+        else
+        {
+            feedbackTexts[0].text = "Hiba";
+            feedbackTexts[1].text = "A mentés sikertelen";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+            feedbackPanel.SetActive(true);
+        }
     }
 
 
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log(Screen.height / listMemberHeight);
+
     }
 
     public void Close()

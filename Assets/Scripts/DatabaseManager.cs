@@ -296,7 +296,7 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT COUNT(*) AS count FROM saves WHERE title = '{saveName}'";
+                command.CommandText = $"SELECT COUNT(*) AS count FROM saves WHERE title = '{saveName}' AND userID = {PlaySession.userID}";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())
@@ -330,6 +330,22 @@ public class DatabaseManager : MonoBehaviour
             {
                 command.CommandText = $"INSERT INTO saves (userID, title, difficulty, moves, levelName, fileName, elapsedTime, savetime) VALUES" +
                     $"('{PlaySession.userID}', '{PlaySession.saveInfo.saveTitle}', '{PlaySession.saveInfo.difficulty}', '{PlaySession.saveInfo.moves}', '{PlaySession.saveInfo.levelName}', '{PlaySession.saveInfo.fileName}', '{PlaySession.saveInfo.elapsedTime}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
+
+    public void OverwriteSave()
+    {
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"UPDATE saves SET " +
+                    $"difficulty = '{PlaySession.saveInfo.difficulty}', moves = '{PlaySession.saveInfo.moves}', levelName = '{PlaySession.saveInfo.levelName}', elapsedTime = '{PlaySession.saveInfo.elapsedTime}', savetime = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}'" +
+                    $"WHERE userID = '{PlaySession.userID}' AND title = '{PlaySession.saveInfo.saveTitle}'";
                 command.ExecuteNonQuery();
             }
             connection.Close();
