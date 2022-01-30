@@ -62,12 +62,16 @@ public class DroneController : MonoBehaviour, ISaveable
         if (!UIEventHandler.isPaused)
         {
             movementInput = controls.Player.Movement.ReadValue<Vector2>().normalized;
+            
             //Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             //rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
             
             if (movementInput.magnitude > 0)
             {
                 rb.transform.up = (Vector3)movementInput;
+                movementInput.x -= 0.0001f;
+                movementInput.y -= 0.0001f;
+
             }
         }
         
@@ -78,7 +82,7 @@ public class DroneController : MonoBehaviour, ISaveable
     private void FixedUpdate()
     {
 
-        rb.velocity = movementInput * speedMultiplier;
+        rb.velocity = movementInput * Time.fixedDeltaTime * speedMultiplier;
     }
 
     public void StartQuiz(NodeBlocker nodeBlocker)

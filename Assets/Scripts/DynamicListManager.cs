@@ -27,6 +27,7 @@ public class DynamicListManager : MonoBehaviour
     [SerializeField] private Image saveFeedbackRect;
     private Text saveFeedbackText;
     [SerializeField] private GameObject chooseButton;
+    [SerializeField] private GameObject deleteButton;
     [SerializeField] private ColorBlock selectedColorBlock;
     private ColorBlock normalColorBlock;
     private ListHeaderProperty headerProperty;
@@ -109,11 +110,14 @@ public class DynamicListManager : MonoBehaviour
 
 
         Button chooseButtonComp = chooseButton.GetComponent<Button>();
-
+        Button deleteButtonComp = deleteButton.GetComponent<Button>();
 
         switch (listType)
         {
             case DynamicListType.SaveList:
+
+                deleteButton.SetActive(true);
+                deleteButtonComp.interactable = false;
 
                 chooseButton.GetComponentInChildren<Text>().text = "Mentés";
                 chooseButtonComp.onClick.RemoveAllListeners();
@@ -142,6 +146,9 @@ public class DynamicListManager : MonoBehaviour
                 break;
             case DynamicListType.LoadList:
 
+                deleteButton.SetActive(true);
+                deleteButtonComp.interactable = false;
+
                 chooseButton.GetComponentInChildren<Text>().text = "Betöltés";
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
@@ -160,6 +167,7 @@ public class DynamicListManager : MonoBehaviour
                 }
                 break;
             default:
+                deleteButton.SetActive(false);
                 break;
         }
 
@@ -263,6 +271,7 @@ public class DynamicListManager : MonoBehaviour
         {
             case DynamicListType.SaveList:
                 chooseButton.GetComponent<Button>().interactable = true;
+                deleteButton.GetComponent<Button>().interactable = true;
 
                 if (clickedButton == selectedButton)
                 {
@@ -292,6 +301,7 @@ public class DynamicListManager : MonoBehaviour
                 break;
             case DynamicListType.LoadList:
                 chooseButton.GetComponent<Button>().interactable = true;
+                deleteButton.GetComponent<Button>().interactable = true;
 
                 if (clickedButton == selectedButton)
                 {
@@ -444,7 +454,9 @@ public class DynamicListManager : MonoBehaviour
             selectedButtonComp.colors = normalColorBlock;
             selectedButton = null;
         }
+        deleteButton.GetComponent<Button>().interactable = false;
         chooseButton.GetComponent<Button>().interactable = false;
+
     }
 
     public void OpenPanel(GameObject panel)
@@ -460,7 +472,7 @@ public class DynamicListManager : MonoBehaviour
 
     private void OverwriteSelectedSave()
     {
-        Debug.Log("Overwrite the save");
+
         SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
 
         if (gameController.Save(saveInfo.saveTitle, saveInfo.fileName, true))
@@ -483,6 +495,72 @@ public class DynamicListManager : MonoBehaviour
             feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
             feedbackPanel.SetActive(true);
         }
+    }
+
+    public void DeleteButtonClicked()
+    {
+        switch (listType)
+        {
+            case DynamicListType.SaveList:
+                if (selectedButton != null)
+                {
+                    confirmationTexts[0].text = "Törlés";
+                    confirmationTexts[1].text = "Biztosan törlöd a kiválasztott mentést?\n(Ez a mûvelet nem fordítható vissza)";
+                    confirmPanelButton.GetComponentInChildren<Text>().text = "Törlés";
+                    confirmPanelButton.onClick.RemoveAllListeners();
+                    confirmPanelButton.onClick.AddListener(delegate { DeleteSelectedSave(); });
+                    confirmationPanel.SetActive(true);
+                }
+                break;
+            case DynamicListType.LoadList:
+                if (selectedButton != null)
+                {
+                    confirmationTexts[0].text = "Törlés";
+                    confirmationTexts[1].text = "Biztosan törlöd a kiválasztott mentést?\n(Ez a mûvelet nem fordítható vissza)";
+                    confirmPanelButton.GetComponentInChildren<Text>().text = "Törlés";
+                    confirmPanelButton.onClick.RemoveAllListeners();
+                    confirmPanelButton.onClick.AddListener(delegate { DeleteSelectedSave(); });
+                    confirmationPanel.SetActive(true);
+                }
+                break;
+            default:
+                break;
+        }
+    }
+
+    private void DeleteSelectedSave()
+    {
+        confirmationPanel.SetActive(false);
+
+        SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
+
+        if (FileManager.DeleteFile(FileManager.saveDirectory, saveInfo.fileName, ".save"))
+        {
+
+            databaseManager.DeleteSave(saveInfo.saveTitle);
+            LoadButtons();
+            if (saveInfo.saveTitle == PlaySession.saveInfo.saveTitle)
+            {
+                PlaySession.saveInfo.saveTitle = null;
+                PlaySession.saveInfo.fileName = null;
+            }
+            feedbackTexts[0].text = "Törlés";
+            feedbackTexts[1].text = "A mentés sikeresen törölve";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+            feedbackPanel.SetActive(true);
+        }
+        else
+        {
+            feedbackTexts[0].text = "Hiba";
+            feedbackTexts[1].text = "A törlés sikertelen";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+            feedbackPanel.SetActive(true);
+        }
+
     }
 
 

@@ -82,4 +82,20 @@ public static class FileManager
             return false;
         }
     }
+
+    public static bool DeleteFile(string folderPath, string fileName, string extension)
+    {
+        var fullPath = Path.Combine(folderPath, fileName + extension);
+
+        try
+        {
+            File.Delete(fullPath);
+            return true;
+        }
+        catch (Exception e)
+        {
+            Debug.LogError($"Failed to delete {fullPath} with exception {e}");
+            return false;
+        }
+    }
 }

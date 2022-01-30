@@ -40,9 +40,15 @@ TagManager:
   - 
   - 
   m_SortingLayers:
-  - name: Player
-    uniqueID: 1574217073
-    locked: 0
   - name: Default
     uniqueID: 0
+    locked: 0
+  - name: Lines
+    uniqueID: 1326224165
+    locked: 0
+  - name: Nodes
+    uniqueID: 1427183155
+    locked: 0
+  - name: Player
+    uniqueID: 1574217073
     locked: 0

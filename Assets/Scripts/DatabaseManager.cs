@@ -353,10 +353,23 @@ public class DatabaseManager : MonoBehaviour
     }
 
 
-    public void ChangeText(InputField inputField)
+    public void DeleteSave(string saveTitle)
     {
-        outputField.text = inputField.text;
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"DELETE FROM saves WHERE" +
+                    $"(userID = '{PlaySession.userID}' AND title = '{saveTitle}')";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
     }
+
+
+
 
     
 }
