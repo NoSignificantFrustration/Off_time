@@ -40,19 +40,21 @@ public class PowerConnection : MonoBehaviour, IConnectable
         if (lr == null)
         {
             lr = GetComponent<LineRenderer>();
-            
+
         }
 
         if (active)
         {
-            lr.material.color = new Color(0, 255, 0);
+            lr.startColor = new Color(0, 255, 0);
+            lr.endColor = new Color(0, 255, 0);
         }
         else
         {
-            lr.material.color = new Color(255, 0, 0);
+            lr.startColor = new Color(255, 0, 0);
+            lr.endColor = new Color(255, 0, 0);
         }
 
-        
+
 
         lr.positionCount = joints.Length + 3;
         lr.SetPosition(0, input.transform.position);
@@ -69,11 +71,13 @@ public class PowerConnection : MonoBehaviour, IConnectable
         active = state;
         if (state)
         {
-            lr.material.color = new Color(0, 255, 0);
+            lr.startColor = new Color(0, 255, 0);
+            lr.endColor = new Color(0, 255, 0);
         }
         else
         {
-            lr.material.color = new Color(255, 0, 0);
+            lr.startColor = new Color(255, 0, 0);
+            lr.endColor = new Color(255, 0, 0);
         }
         outputInterface.Pulse();
         
