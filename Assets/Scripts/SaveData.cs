@@ -7,6 +7,7 @@ public class SaveData
 {
     public List<NodeData> nodeDatas = new List<NodeData>();
     public List<BlockerData> blockerDatas = new List<BlockerData>();
+    public List<DoorData> doorDatas = new List<DoorData>();
     public DroneData droneData;
 
     public string SaveAsjson()
@@ -49,6 +50,13 @@ public class SaveData
     public struct DroneData
     {
         public float[] position;
+    }
+
+    [System.Serializable]
+    public struct DoorData
+    {
+        public string uid;
+        public bool open;
     }
 }
 

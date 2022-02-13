@@ -54,6 +54,7 @@ public class UIEventHandler : MonoBehaviour
                 currentUI.SetActive(false);
                 currentUI = null;
                 uiStack.Clear();
+                isPaused = false;
                 return;
             }
             currentUI.SetActive(false);

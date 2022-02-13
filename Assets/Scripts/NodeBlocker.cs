@@ -7,10 +7,12 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
 {
     [SerializeField] private PowerConnection input;
     [SerializeField] private PowerNode output;
+    [SerializeField] private float range;
     [SerializeField] private Sprite[] sprites;
     [SerializeField] private bool isActivated = false;
     [SerializeField] private bool isLocked = true;
     [SerializeField] private string uid;
+    private bool in_range;
     private SpriteRenderer sr;
 
     public void LoadSprite()
@@ -58,7 +60,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
     {
 
         
-        if (isActivated && isLocked)
+        if (isActivated && isLocked && in_range)
         {
             drone.StartQuiz(this);
         }
@@ -81,13 +83,44 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
     public void Startup()
     {
         LoadSprite();
+        if (isLocked)
+        {
+            sr.color = Color.red;
+        }
         //Debug.Log(uid);
     }
 
     // Update is called once per frame
     void Update()
     {
-        
+        if (!isLocked)
+        {
+            return;
+        }
+
+        bool tempState;
+
+        if (Vector3.Distance(GameController.GetPlayer().transform.position, transform.position) <= range)
+        {
+            tempState = true;
+        }
+        else
+        {
+            tempState = false;
+        }
+
+        if (in_range != tempState)
+        {
+            in_range = tempState;
+            if (in_range)
+            {
+                sr.color = Color.white;
+            }
+            else
+            {
+                sr.color = Color.red;
+            }
+        }
     }
 
     public void AddToSave(SaveData saveData)

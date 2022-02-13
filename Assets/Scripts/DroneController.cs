@@ -6,7 +6,7 @@ using UnityEngine.InputSystem;
 
 public class DroneController : MonoBehaviour, ISaveable
 {
-
+    [SerializeField] private Transform cameraTransform;
     [SerializeField] private float speedMultiplier;
     [SerializeField] private UIEventHandler quizHandler;
     private Vector2 movementInput;
@@ -61,18 +61,44 @@ public class DroneController : MonoBehaviour, ISaveable
     {
         if (!UIEventHandler.isPaused)
         {
-            movementInput = controls.Player.Movement.ReadValue<Vector2>().normalized;
-            
+            movementInput = controls.Player.Movement.ReadValue<Vector2>();
+
             //Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
             //rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
             
             if (movementInput.magnitude > 0)
             {
-                rb.transform.up = (Vector3)movementInput;
-                movementInput.x -= 0.0001f;
-                movementInput.y -= 0.0001f;
+                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, movementInput), Time.fixedDeltaTime * 10);
+                //float zRot = Vector2.SignedAngle(Vector2.up, movementInput);
+                //Vector3 targetRot = new Vector3(0, 0, Vector2.SignedAngle(Vector2.up, movementInput));
+                //if (zRot < 0)
+                //{
+                //    targetRot = new Vector3(0, 0, Mathf.Abs(Vector2.SignedAngle(Vector2.up, movementInput)));
+                //}
+                //else
+                //{
+                //    targetRot = new Vector3(0, 0, Vector2.SignedAngle(Vector2.up, movementInput) + 180);
+                //}
+
+                //Debug.Log(Vector3.Distance(transform.eulerAngles, targetRot));
+                ////rb.transform.up = (Vector3)movementInput;
+                //if (Vector3.Distance(transform.eulerAngles, targetRot) > 0.01f)
+                //{
+                //    transform.eulerAngles = Vector3.Lerp(transform.rotation.eulerAngles, targetRot, Time.deltaTime * 10f);
+                //}
+                //else
+                //{
+                //    transform.eulerAngles = targetRot;
+                //}
+                //transform.rotation.eulerAngles = 0;
+
+
+
+                //movementInput.x -= 0.0001f;
+                //movementInput.y -= 0.0001f;
 
             }
+            //cameraTransform.position = new Vector3(rb.transform.position.x, rb.position.y, -10);
         }
         
 

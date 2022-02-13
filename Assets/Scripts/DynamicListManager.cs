@@ -30,6 +30,7 @@ public class DynamicListManager : MonoBehaviour
     [SerializeField] private GameObject deleteButton;
     [SerializeField] private ColorBlock selectedColorBlock;
     private ColorBlock normalColorBlock;
+    private Color textColor;
     private ListHeaderProperty headerProperty;
     private List<GameObject> listMemberButtons = new List<GameObject>();
     private List<SaveGameInfo> saveGameInfos;
@@ -47,6 +48,7 @@ public class DynamicListManager : MonoBehaviour
         normalColorBlock = buttonPrefab.GetComponent<Button>().colors;
         saveGameInfos = new List<SaveGameInfo>();
         saveFeedbackText = saveFeedbackRect.GetComponentInChildren<Text>();
+        textColor = buttonPrefab.GetComponentInChildren<Text>().color;
     }
 
     // Start is called before the first frame update
@@ -214,6 +216,7 @@ public class DynamicListManager : MonoBehaviour
                     textComponent.fontSize = listFontSize;
                     textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
                     textComponent.alignment = headerProperty.textAnchors[i];
+                    textComponent.color = textColor;
                     rectTransform.SetParent(button.transform);
                     rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
                     rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
@@ -238,6 +241,7 @@ public class DynamicListManager : MonoBehaviour
                     textComponent.fontSize = listFontSize;
                     textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
                     textComponent.alignment = headerProperty.textAnchors[i];
+                    textComponent.color = textColor;
                     rectTransform.SetParent(button.transform);
                     rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
                     rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);

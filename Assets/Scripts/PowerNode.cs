@@ -59,6 +59,10 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     {
         LoadSprite();
         PreRotate();
+        if (isLocked)
+        {
+            sr.color = Color.red;
+        }
         if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse)
         {
             Pulse();
@@ -572,6 +576,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     public void Unlock()
     {
         isLocked = false;
+        sr.color = Color.white;
     }
     public PowerConnection GetNeighbor(int nIndex)
     {

@@ -27,15 +27,18 @@ public class ShadowCaster2DFromCollider : MonoBehaviour
     }
 
 
-    private void Start()
+    private void Awake()
     {
         _shadowCaster = GetComponent<ShadowCaster2D>();
         spriteShapeController = GetComponent<SpriteShapeController>();
-        UpdateShadow();
+        
     }
 
     public void UpdateShadow()
     {
+        _shadowCaster = GetComponent<ShadowCaster2D>();
+        spriteShapeController = GetComponent<SpriteShapeController>();
+
         //var points = _polygonCollider == null ? _edgeCollider.points : _polygonCollider.points;
         Vector3[] points = new Vector3[spriteShapeController.spline.GetPointCount()];
         for (int i = 0; i < points.Length; i++)
