@@ -50,11 +50,13 @@ public class UIEventHandler : MonoBehaviour
         {
             if (currentUI == quizMenu)
             {
-                drone.FinishQuiz(false);
+                //drone.FinishQuiz(false);
+                drone.isSolvingPuzzle = false;
                 currentUI.SetActive(false);
                 currentUI = null;
                 uiStack.Clear();
                 isPaused = false;
+                Time.timeScale = 1f;
                 return;
             }
             currentUI.SetActive(false);
@@ -158,9 +160,9 @@ public class UIEventHandler : MonoBehaviour
     {
         
         drone.FinishQuiz(result);
-        currentUI.SetActive(false);
-        currentUI = null;
-        isPaused = false;
+        //currentUI.SetActive(false);
+        //currentUI = null;
+        //isPaused = false;
     }
 
     public void LoadFromSave()

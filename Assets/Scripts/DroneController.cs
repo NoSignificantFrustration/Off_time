@@ -13,7 +13,7 @@ public class DroneController : MonoBehaviour, ISaveable
     private PlayerInputAsset controls;
     private Rigidbody2D rb;
     private SpriteRenderer sr;
-    private bool isSolvingPuzzle;
+    public bool isSolvingPuzzle;
     private NodeBlocker blocker;
 
     private void Awake()
@@ -133,9 +133,7 @@ public class DroneController : MonoBehaviour, ISaveable
         {
             blocker.Unlock();
         }
-        isSolvingPuzzle = false;
         blocker = null;
-        Time.timeScale = 1f;
     }
 
     private void OnEnable()
