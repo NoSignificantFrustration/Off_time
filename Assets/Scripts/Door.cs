@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
+/// <summary>
+/// Logic for the doors
+/// </summary>
+/// 
 public class Door : MonoBehaviour
 {
     [SerializeField] private GameObject door;
@@ -17,17 +21,6 @@ public class Door : MonoBehaviour
         bc = door.GetComponentInChildren<BoxCollider2D>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 
     public void ToggleDoor(bool open)
     {

@@ -9,24 +9,40 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Class that handles database operations.
+/// </summary>
+/// <param name="dbName">The name of the database.</param>
+/// <param name="connectionPath">Path to the database file.</param>
+/// <param name="outputField">Text field where results can be outputted.</param>
 public class DatabaseManager : MonoBehaviour
 {
 
+    
     [SerializeField] private string dbName = "GameDB";
     private string connectionPath;
     [SerializeField] private Text outputField;
 
+    /// <summary>
+    /// Sets the connection path when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         connectionPath = "URI=file:" + Application.persistentDataPath + "/" + dbName + ".db";
     }
 
+    /// <summary>
+    /// Calls SetupDB() when the game starts.
+    /// </summary>
     private void Start()
     {
         SetupDB();
         //Debug.Log(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"));
     }
 
+    /// <summary>
+    /// Sets up the database if it wasn't already, or replaces it if it's missing.
+    /// </summary>
     private void SetupDB()
     {
 
@@ -83,6 +99,10 @@ public class DatabaseManager : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Runs the query from the specified InputField.
+    /// </summary>
+    /// <param name="inputField">Source InputField.</param>
     public void RunQuery(InputField inputField)
     {
         outputField.text = "";
@@ -112,6 +132,10 @@ public class DatabaseManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Runs the specified query.
+    /// </summary>
+    /// <param name="input">Query text.</param>
     public void RunQuery(string input)
     {
         
@@ -131,8 +155,12 @@ public class DatabaseManager : MonoBehaviour
 
     }
 
-    
 
+    /// <summary>
+    /// Gets a random question from the database.
+    /// </summary>
+    /// <returns>QuizHandler.QuizData</returns>
+    /// <seealso cref="QuizHandler.QuizData"/>
     public QuizHandler.QuizData GetQuestion()
     {
         QuizHandler.QuizData dat;
@@ -166,6 +194,12 @@ public class DatabaseManager : MonoBehaviour
         return dat;
     }
 
+    /// <summary>
+    /// Tries to register a user.
+    /// </summary>
+    /// <param name="username">Username</param>
+    /// <param name="password">Password</param>
+    /// <returns>True if successful, false if the username is already taken.</returns>
     public bool RegisterUser(string username, string password)
     {
 
@@ -177,6 +211,7 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
+                //Check if the username is taken
                 command.CommandText = "SELECT COUNT(*) AS 'count' FROM users WHERE username='" + username +"'" ;
                 command.ExecuteNonQuery();
 
@@ -193,6 +228,7 @@ public class DatabaseManager : MonoBehaviour
                     {
                         reader.Close();
                         alreadyExists = false;
+                        //Register the user
                         command.CommandText = "INSERT INTO users (username, passwd) VALUES " +
                             "('" + username + "', '" + password + "')";
                         command.ExecuteNonQuery();
@@ -208,6 +244,14 @@ public class DatabaseManager : MonoBehaviour
         return !alreadyExists;
     }
 
+    /// <summary>
+    /// Checks if a user with the specified username and password exists, and makes their ID available.
+    /// </summary>
+    /// <param name="username">Username</param>
+    /// <param name="password">Password</param>
+    /// <param name="userID">UserID</param>
+    /// <param name="uname">Username</param>
+    /// <returns>True if the login values check out, false if they don't.</returns>
     public bool Login(string username, string password, out int userID, out string uname)
     {
 
@@ -248,6 +292,11 @@ public class DatabaseManager : MonoBehaviour
         return success;
     }
 
+    /// <summary>
+    /// Gets the current user's saved games using their ID.
+    /// </summary>
+    /// <returns>A list of SaveGameInfos</returns>
+    /// <seealso cref="SaveGameInfo"/>
     public List<SaveGameInfo> GetSavedGames()
     {
         List<SaveGameInfo> saveGameInfos = new List<SaveGameInfo>();
@@ -285,6 +334,11 @@ public class DatabaseManager : MonoBehaviour
         return saveGameInfos;
     }
 
+    /// <summary>
+    /// Checks if the current user already has a save with the specified name.
+    /// </summary>
+    /// <param name="saveName">The name.</param>
+    /// <returns>True if it's taken, false if it's not.</returns>
     public bool CheckIfSaveNameTaken(string saveName)
     {
 
@@ -320,6 +374,10 @@ public class DatabaseManager : MonoBehaviour
         return taken;
     }
 
+    /// <summary>
+    /// Makes a new save record with the current PlaySession.
+    /// </summary>
+    /// <seealso cref="PlaySession"/>
     public void AddSave()
     {
 
@@ -336,6 +394,10 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Overwrites the save record specified by the current PlaySession save title.
+    /// </summary>
+    /// <seealso cref="PlaySession"/>
     public void OverwriteSave()
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
@@ -352,7 +414,10 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-
+    /// <summary>
+    /// Deletes the user's save record with the specified name.
+    /// </summary>
+    /// <param name="saveTitle">Save title</param>
     public void DeleteSave(string saveTitle)
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
