@@ -12,15 +12,15 @@ using UnityEngine.UI;
 /// <summary>
 /// Class that handles database operations.
 /// </summary>
-/// <param name="dbName">The name of the database.</param>
-/// <param name="connectionPath">Path to the database file.</param>
-/// <param name="outputField">Text field where results can be outputted.</param>
+
 public class DatabaseManager : MonoBehaviour
 {
 
-    
+    /// <summary>The name of the database.</summary>
     [SerializeField] private string dbName = "GameDB";
+    /// <summary>Path to the database file.</summary>
     private string connectionPath;
+    /// <summary>Text field where results can be outputted.</summary>
     [SerializeField] private Text outputField;
 
     /// <summary>

@@ -3,40 +3,44 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Logic for the nodes that control the doors.
+/// </summary>
+/// <seealso cref="Door"/>
+/// <seealso cref="PowerConnection"/>
 public class DoorController : MonoBehaviour, IConnectable, ISaveable
 {
-    
+    /// <summary>Input PowerConnection</summary>
     [SerializeField] private PowerConnection input;
+    /// <summary>The door this controls</summary>
     [SerializeField] private Door door;
+    /// <summary>Current state</summary>
     [SerializeField] private bool open;
+    /// <summary>Sprites</summary>
     [SerializeField] private Sprite[] sprites;
+    /// <summary>SpriteRenderer component</summary>
     private SpriteRenderer sr;
+    /// <summary>Unique identifier</summary>
     [SerializeField] private string uid;
 
+    /// <summary>
+    /// Gets the SpriteRenderer component when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
-
-
+    
     public void Click(DroneController drone = null)
     {
         
     }
 
+    /// <summary>
+    /// Sends the transform of this GameObject.
+    /// </summary>
+    /// <returns>The transform of this GameObject</returns>
     public Transform GetTransform()
     {
         return transform;
