@@ -8,6 +8,8 @@ using UnityEngine;
 /// </summary>
 /// <seealso cref="Door"/>
 /// <seealso cref="PowerConnection"/>
+/// <seealso cref="IConnectable"/>
+/// <seealso cref="ISaveable"/>
 public class DoorController : MonoBehaviour, IConnectable, ISaveable
 {
     /// <summary>Input PowerConnection</summary>
@@ -58,6 +60,9 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Loads the sprite corresponding with the node's state.
+    /// </summary>
     private void LoadSprite()
     {
         if (!open)
@@ -75,6 +80,12 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
         
     }
 
+    /// <summary>
+    /// Adds this node's information to the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
+    /// <seealso cref="SaveData"/>
+    /// <seealso cref="SaveData.DoorData"/>
     public void AddToSave(SaveData saveData)
     {
         SaveData.DoorData data = new SaveData.DoorData();
@@ -83,6 +94,10 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
         saveData.doorDatas.Add(data);
     }
 
+    /// <summary>
+    /// Loads the door's information from the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
     public void LoadFromSave(SaveData saveData)
     {
         foreach (SaveData.DoorData item in saveData.doorDatas)
@@ -95,12 +110,20 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Initial setup for the door.
+    /// </summary>
     public void Startup()
     {
         door.ToggleDoor(open);
         LoadSprite();
     }
 
+    /// <summary>
+    /// For internal use. Returns this object if it has no uid or is forced to.
+    /// </summary>
+    /// <param name="force">Force state</param>
+    /// <returns></returns>
     public UnityEngine.Object GetObject(bool force = false)
     {
         if (uid == null || uid == "" || force)

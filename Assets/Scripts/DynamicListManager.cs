@@ -4,43 +4,88 @@ using System.Text.RegularExpressions;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Logic for dynamic UI lists.
+/// </summary>
+/// <seealso cref="GameController"/>
+/// <seealso cref="UIEventHandler"/>
+/// <seealso cref="DatabaseManager"/>
+/// <seealso cref="DynamicListType"/>
+/// <seealso cref="ListHeaderProperty"/>
+/// <seealso cref="SaveGameInfo"/>
 public class DynamicListManager : MonoBehaviour
 {
+    /// <summary>The level's GameController</summary>
     [SerializeField] private GameController gameController;
+    /// <summary>The level's UIEventHandler</summary>
     [SerializeField] private UIEventHandler uiEventHandler;
+    /// <summary>The level's DatabaseManager</summary>
     [SerializeField] private DatabaseManager databaseManager;
+    /// <summary>The button prefab the list will use</summary>
     [SerializeField] private GameObject buttonPrefab;
+    /// <summary>Number of buttons, debug option</summary>
     [SerializeField] private int btnAmount;
+    /// <summary>Type of the list</summary>
     [SerializeField] private DynamicListType listType;
+    /// <summary>List member height</summary>
     [SerializeField] private float listMemberHeight;
+    /// <summary>Reference to the list header</summary>
     [SerializeField] private GameObject header;
+    /// <summary>Header font size</summary>
     [SerializeField] private int headerFontSize;
+    /// <summary>List member font size</summary>
     [SerializeField] private int listFontSize;
+    /// <summary>Reference to the confirmation panel</summary>
     [SerializeField] private GameObject confirmationPanel;
+    /// <summary>References to the confirmation text fields</summary>
     [SerializeField] private Text[] confirmationTexts = new Text[2];
+    /// <summary>Reference to the confirmation panel's button</summary>
     [SerializeField] private Button confirmPanelButton;
+    /// <summary>Reference to the feedback panel</summary>
     [SerializeField] private GameObject feedbackPanel;
+    /// <summary>References to the feedback text fields</summary>
     [SerializeField] private Text[] feedbackTexts = new Text[2];
+    /// <summary>Reference to the feedback panel's button</summary>
     [SerializeField] private Button feedbackPanelButton;
+    /// <summary>Reference to the new save panel</summary>
     [SerializeField] private GameObject newSavePanel;
+    /// <summary>Reference to the new save panel's input field</summary>
     [SerializeField] private InputField newSaveInput;
+    /// <summary>Reference to the new save panel's feedback rectangle</summary>
     [SerializeField] private Image saveFeedbackRect;
+    /// <summary>Reference to the new save panel's feedback text field</summary>
     private Text saveFeedbackText;
+    /// <summary>Reference to the choose button</summary>
     [SerializeField] private GameObject chooseButton;
+    /// <summary>Reference to the delete button</summary>
     [SerializeField] private GameObject deleteButton;
+    /// <summary>Colors that will be assigned to the selected list member button</summary>
     [SerializeField] private ColorBlock selectedColorBlock;
+    /// <summary>Colors that will be assigned to the normal list member button</summary>
     private ColorBlock normalColorBlock;
+    /// <summary>Color of the list's text fields</summary>
     private Color textColor;
+    /// <summary>The header's field information</summary>
     private ListHeaderProperty headerProperty;
+    /// <summary>The generated buttons</summary>
     private List<GameObject> listMemberButtons = new List<GameObject>();
+    /// <summary>The SaveGameInfos that belong to the list members</summary>
     private List<SaveGameInfo> saveGameInfos;
+    /// <summary>The currently selected button</summary>
     private GameObject selectedButton;
+    /// <summary>Time of the last click on a list list member</summary>
     private float lastClickTime;
+    /// <summary>The currently selected header column</summary>
     public GameObject selectedHeader;
+    /// <summary>The UI element the list is confined to</summary>
     private GameObject content;
+    /// <summary>The list's ContentSizeFitter</summary>
     private ContentSizeFitter contentFitter;
 
 
+    /// <summary>
+    /// Gets references when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         content = gameObject.GetComponent<ScrollRect>().content.gameObject;
@@ -51,6 +96,9 @@ public class DynamicListManager : MonoBehaviour
         textColor = buttonPrefab.GetComponentInChildren<Text>().color;
     }
 
+    /// <summary>
+    /// Initialises lastClickTime when the game starts.
+    /// </summary>
     // Start is called before the first frame update
     void Start()
     {
@@ -62,6 +110,10 @@ public class DynamicListManager : MonoBehaviour
         //Canvas.ForceUpdateCanvases();
     }
 
+    /// <summary>
+    /// Reinitialises the list with as the provided DynamicListType.
+    /// </summary>
+    /// <param name="listType">New DynamicListType</param>
     public void ReloadList(DynamicListType listType)
     {
         this.listType = listType;
@@ -70,16 +122,21 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
-
+    /// <summary>
+    /// Sets up the header.
+    /// </summary>
     private void SetupHeader()
     {
 
+        //Destroy all existing header elements
         foreach (Transform child in header.transform)
         {
             GameObject.Destroy(child.gameObject);
         }
 
+        //Initialise a ListHeaderProperty corresponding to the current DynamicListType
         headerProperty = new ListHeaderProperty(listType);
+        //Create header members according to the ListHeaderProperty
         for (int i = 0; i < headerProperty.textFields.Length; i++)
         {
             GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
@@ -91,6 +148,7 @@ public class DynamicListManager : MonoBehaviour
             headerProperty.textFields[i].fontSize = headerFontSize;
             RectTransform rectTransform = button.GetComponent<RectTransform>();
             rectTransform.SetParent(header.transform);
+            //Set up the anchors
             rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
             rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
             rectTransform.pivot = new Vector2(0f, 1f);
@@ -102,8 +160,12 @@ public class DynamicListManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Sets up the list members.
+    /// </summary>
     private void LoadButtons()
     {
+        //Destroy all existing list members
         foreach (Transform child in content.transform)
         {
             GameObject.Destroy(child.gameObject);
@@ -114,18 +176,22 @@ public class DynamicListManager : MonoBehaviour
         Button chooseButtonComp = chooseButton.GetComponent<Button>();
         Button deleteButtonComp = deleteButton.GetComponent<Button>();
 
+        //Set up list members according to the current DynamicListType
         switch (listType)
         {
             case DynamicListType.SaveList:
 
+                //Set up delete button
                 deleteButton.SetActive(true);
                 deleteButtonComp.interactable = false;
 
+                //Set up choose button
                 chooseButton.GetComponentInChildren<Text>().text = "Mentés";
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
                 chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
+                //Add new save button
                 GameObject newSaveButton = CreateListMember();
                 Button newSaveButtonComponent = newSaveButton.GetComponent<Button>();
                 newSaveButtonComponent.onClick.AddListener(delegate { NewSaveSlotPressed(); });
@@ -134,7 +200,10 @@ public class DynamicListManager : MonoBehaviour
                 textComponent.fontSize = (int)listMemberHeight - 10;
                 listMemberButtons.Add(newSaveButton);
 
+                //Get the user's saves from the database
                 saveGameInfos = databaseManager.GetSavedGames();
+
+                //Set up a button for each SaveGameInfo
                 for (int i = 0; i < saveGameInfos.Count; i++)
                 {
                     GameObject button = CreateListMember();
@@ -142,21 +211,28 @@ public class DynamicListManager : MonoBehaviour
                     Button bComponent = button.GetComponent<Button>();
                     bComponent.onClick.AddListener(delegate { ListElementPressed(button); });
                     button.name = i.ToString();
+
+                    //Set up the text fields of the button
                     CreateTextFields(button, i);
                     listMemberButtons.Add(button);
                 }
                 break;
             case DynamicListType.LoadList:
 
+                //Set up delete button
                 deleteButton.SetActive(true);
                 deleteButtonComp.interactable = false;
 
+                //Set up choose button
                 chooseButton.GetComponentInChildren<Text>().text = "Betöltés";
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
                 chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
+                //Get the user's saves from the database
                 saveGameInfos = databaseManager.GetSavedGames();
+
+                //Set up a button for each SaveGameInfo
                 for (int i = 0; i < saveGameInfos.Count; i++)
                 {
                     GameObject button = CreateListMember();
@@ -164,6 +240,7 @@ public class DynamicListManager : MonoBehaviour
                     Button bComponent = button.GetComponent<Button>();
                     bComponent.onClick.AddListener(delegate { ListElementPressed(button); });
                     button.name = i.ToString();
+                    //Set up the text fields of the button
                     CreateTextFields(button, i);
                     listMemberButtons.Add(button);
                 }
@@ -173,12 +250,14 @@ public class DynamicListManager : MonoBehaviour
                 break;
         }
 
-
-
-
+        //Force an update on the ContentSizeFitter to fit all list members in the scroll box
         contentFitter.verticalFit = ContentSizeFitter.FitMode.PreferredSize;
     }
 
+    /// <summary>
+    /// Creates a list member button.
+    /// </summary>
+    /// <returns>The created button.</returns>
     public GameObject CreateListMember()
     {
         GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
@@ -188,16 +267,21 @@ public class DynamicListManager : MonoBehaviour
         rectTransform.anchorMax = new Vector2(1f, 1f);
         rectTransform.pivot = new Vector2(0f, 1f);
         rectTransform.localScale = new Vector3(1f, 1f, 1f);
-        rectTransform.localPosition = new Vector3(0f, listMemberButtons.Count * -listMemberHeight, 0f);
-        rectTransform.sizeDelta = new Vector2(0f, listMemberHeight);
+        rectTransform.localPosition = new Vector3(0f, listMemberButtons.Count * -listMemberHeight, 0f); //Set the position of the button
+        rectTransform.sizeDelta = new Vector2(0f, listMemberHeight); //Set the height of the button
         Color imageColor = new Color(1f, 1f, 1f, 0.470f);
         button.GetComponent<Image>().color = imageColor;
         return button;
     }
 
+    /// <summary>
+    /// Creates text fields in the specified button.
+    /// </summary>
+    /// <param name="button">Button</param>
+    /// <param name="index">Data index</param>
     public void CreateTextFields(GameObject button, int index)
     {
-
+        //Destroy the text field the prefab already has
         Destroy(button.transform.GetChild(0).gameObject);
 
         ListMemberText listMemberText;
@@ -205,8 +289,10 @@ public class DynamicListManager : MonoBehaviour
         {
             case DynamicListType.SaveList:
 
+                //Get the displayable text from the SaveGameInfo specified by the given index
                 listMemberText = new ListMemberText(saveGameInfos[index]);
 
+                //Create text fields acoording to the new ListMemberText
                 for (int i = 0; i < headerProperty.textFields.Length; i++)
                 {
                     GameObject textObject = new GameObject($"ButtonTextField{i}");
@@ -218,8 +304,10 @@ public class DynamicListManager : MonoBehaviour
                     textComponent.alignment = headerProperty.textAnchors[i];
                     textComponent.color = textColor;
                     rectTransform.SetParent(button.transform);
+                    //Set up the anchors
                     rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
                     rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
+                    //Set up the transform
                     rectTransform.pivot = new Vector2(0f, 1f);
                     rectTransform.localScale = new Vector3(1f, 1f, 1f);
                     rectTransform.localPosition = Vector3.zero;
@@ -230,8 +318,10 @@ public class DynamicListManager : MonoBehaviour
                 break;
             case DynamicListType.LoadList:
 
+                //Get the displayable text from the SaveGameInfo specified by the given index
                 listMemberText = new ListMemberText(saveGameInfos[index]);
 
+                //Create text fields acoording to the new ListMemberText
                 for (int i = 0; i < headerProperty.textFields.Length; i++)
                 {
                     GameObject textObject = new GameObject($"ButtonTextField{i}");
@@ -243,8 +333,10 @@ public class DynamicListManager : MonoBehaviour
                     textComponent.alignment = headerProperty.textAnchors[i];
                     textComponent.color = textColor;
                     rectTransform.SetParent(button.transform);
+                    //Set up the anchors
                     rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
                     rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
+                    //Set up the transform
                     rectTransform.pivot = new Vector2(0f, 1f);
                     rectTransform.localScale = new Vector3(1f, 1f, 1f);
                     rectTransform.localPosition = Vector3.zero;

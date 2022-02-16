@@ -102,7 +102,7 @@ public class DatabaseManager : MonoBehaviour
     /// <summary>
     /// Runs the query from the specified InputField.
     /// </summary>
-    /// <param name="inputField">Source InputField.</param>
+    /// <param name="inputField">Source InputField</param>
     public void RunQuery(InputField inputField)
     {
         outputField.text = "";
@@ -135,7 +135,7 @@ public class DatabaseManager : MonoBehaviour
     /// <summary>
     /// Runs the specified query.
     /// </summary>
-    /// <param name="input">Query text.</param>
+    /// <param name="input">Query text</param>
     public void RunQuery(string input)
     {
         
@@ -337,7 +337,7 @@ public class DatabaseManager : MonoBehaviour
     /// <summary>
     /// Checks if the current user already has a save with the specified name.
     /// </summary>
-    /// <param name="saveName">The name.</param>
+    /// <param name="saveName">The name</param>
     /// <returns>True if it's taken, false if it's not.</returns>
     public bool CheckIfSaveNameTaken(string saveName)
     {

@@ -4,18 +4,34 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// Logic for the player controlled drone.
+/// </summary>
+/// <seealso cref="UIEventHandler"/>
+/// <seealso cref="NodeBlocker"/>
+/// <seealso cref="ISaveable"/>
 public class DroneController : MonoBehaviour, ISaveable
 {
-    [SerializeField] private Transform cameraTransform;
+    /// <summary>Movement speed multiplier</summary>
     [SerializeField] private float speedMultiplier;
+    /// <summary>Main UIEventHandler</summary>
     [SerializeField] private UIEventHandler quizHandler;
+    /// <summary>Movement direction</summary>
     private Vector2 movementInput;
+    /// <summary>Input scheme</summary>
     private PlayerInputAsset controls;
+    /// <summary>Rigidbody2D component</summary>
     private Rigidbody2D rb;
+    /// <summary>SpriteRenderer component</summary>
     private SpriteRenderer sr;
+    /// <summary>Quiz solving state</summary>
     public bool isSolvingPuzzle;
+    /// <summary>Current NodeBlocker being solved</summary>
     private NodeBlocker blocker;
 
+    /// <summary>
+    /// Gets references to components and sets up listener for left mouse click when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         controls = new PlayerInputAsset();
@@ -25,8 +41,13 @@ public class DroneController : MonoBehaviour, ISaveable
         
     }
 
+    /// <summary>
+    /// Handles the clicking on other objects
+    /// </summary>
+    /// <param name="ctx">Callback context</param>
     private void Click(InputAction.CallbackContext ctx)
     {
+        //We don't want to click on anything else when already unlocking a node or when the game is paused
         if (isSolvingPuzzle || UIEventHandler.isPaused)
         {
             return;
@@ -35,6 +56,7 @@ public class DroneController : MonoBehaviour, ISaveable
 
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+        //If the raycast hit and the hit object can be clicked do exactly that
         if (hit)
         {
             IConnectable iFace;
@@ -50,67 +72,39 @@ public class DroneController : MonoBehaviour, ISaveable
         
     }
 
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
+    /// <summary>
+    /// Gets the current movement input and rotates the transform to face it's direction every frame.
+    /// </summary>
     // Update is called once per frame
     void Update()
     {
         if (!UIEventHandler.isPaused)
         {
             movementInput = controls.Player.Movement.ReadValue<Vector2>();
-
-            //Vector2 mouseWorld = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-            //rb.transform.up = (mouseWorld - (Vector2)transform.position).normalized;
-            
             if (movementInput.magnitude > 0)
             {
                 transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, movementInput), Time.fixedDeltaTime * 10);
-                //float zRot = Vector2.SignedAngle(Vector2.up, movementInput);
-                //Vector3 targetRot = new Vector3(0, 0, Vector2.SignedAngle(Vector2.up, movementInput));
-                //if (zRot < 0)
-                //{
-                //    targetRot = new Vector3(0, 0, Mathf.Abs(Vector2.SignedAngle(Vector2.up, movementInput)));
-                //}
-                //else
-                //{
-                //    targetRot = new Vector3(0, 0, Vector2.SignedAngle(Vector2.up, movementInput) + 180);
-                //}
-
-                //Debug.Log(Vector3.Distance(transform.eulerAngles, targetRot));
-                ////rb.transform.up = (Vector3)movementInput;
-                //if (Vector3.Distance(transform.eulerAngles, targetRot) > 0.01f)
-                //{
-                //    transform.eulerAngles = Vector3.Lerp(transform.rotation.eulerAngles, targetRot, Time.deltaTime * 10f);
-                //}
-                //else
-                //{
-                //    transform.eulerAngles = targetRot;
-                //}
-                //transform.rotation.eulerAngles = 0;
-
-
-
-                //movementInput.x -= 0.0001f;
-                //movementInput.y -= 0.0001f;
-
             }
-            //cameraTransform.position = new Vector3(rb.transform.position.x, rb.position.y, -10);
         }
         
 
         
     }
 
+    /// <summary>
+    /// Sets the rigidbody's velocity 50 times per second.
+    /// </summary>
     private void FixedUpdate()
     {
 
         rb.velocity = movementInput * Time.fixedDeltaTime * speedMultiplier;
     }
 
+
+    /// <summary>
+    /// Pauses time and calls on the UIEventHandler to start a quiz.
+    /// </summary>
+    /// <param name="nodeBlocker">The NodeBlocker that was clicked</param>
     public void StartQuiz(NodeBlocker nodeBlocker)
     {
         if (quizHandler == null)
@@ -127,6 +121,10 @@ public class DroneController : MonoBehaviour, ISaveable
 
     }
 
+    /// <summary>
+    /// Unlocks the current NodeBlocker if the quiz was successful.
+    /// </summary>
+    /// <param name="result">The outcome of the quiz</param>
     public void FinishQuiz(bool result)
     {
         if (result)
@@ -136,16 +134,28 @@ public class DroneController : MonoBehaviour, ISaveable
         blocker = null;
     }
 
+    /// <summary>
+    /// Enables controls when the script is enabled.
+    /// </summary>
     private void OnEnable()
     {
         controls.Enable();
     }
 
+    /// <summary>
+    /// Disables controls when the script is Disabled.
+    /// </summary>
     private void OnDisable()
     {
         controls.Disable();
     }
 
+    /// <summary>
+    /// Saves the drone's information to the specified SaveData.
+    /// </summary>
+    /// <param name="saveData">The SaveData the drone's DroneData should be added to</param>
+    /// <seealso cref="SaveData"/>
+    /// <seealso cref="SaveData.DroneData"/>
     public void AddToSave(SaveData saveData)
     {
         SaveData.DroneData data = new SaveData.DroneData();
@@ -153,6 +163,10 @@ public class DroneController : MonoBehaviour, ISaveable
         saveData.droneData = data;
     }
 
+    /// <summary>
+    /// Loads the drone's information from the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
     public void LoadFromSave(SaveData saveData)
     {
         transform.position = new Vector3(saveData.droneData.position[0], saveData.droneData.position[1], saveData.droneData.position[2]);
