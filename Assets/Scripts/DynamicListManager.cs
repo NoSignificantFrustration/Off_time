@@ -354,12 +354,19 @@ public class DynamicListManager : MonoBehaviour
     }
 
 
-
+    /// <summary>
+    /// Sorts the list according to the pressed button's column.
+    /// </summary>
+    /// <param name="button">Pressed button</param>
     private void HeaderElementPressed(GameObject button)
     {
         LoadButtons();
     }
 
+    /// <summary>
+    /// Selects the clicked button, also detects double clicks and calls ChoseButtonClicked().
+    /// </summary>
+    /// <param name="clickedButton">Pressed button</param>
     private void ListElementPressed(GameObject clickedButton)
     {
 
@@ -371,6 +378,7 @@ public class DynamicListManager : MonoBehaviour
 
                 if (clickedButton == selectedButton)
                 {
+                    //Double click detection
                     if (Time.time - lastClickTime <= 0.5f)
                     {
                         ChooseButtonClicked();
@@ -384,12 +392,14 @@ public class DynamicListManager : MonoBehaviour
 
                     Button clickedButtonComp = clickedButton.GetComponent<Button>();
 
+                    //Set the previous button's colors back to normal
                     if (selectedButton != null)
                     {
                         Button selectedButtonComp = selectedButton.GetComponent<Button>();
                         selectedButtonComp.colors = normalColorBlock;
                     }
 
+                    //Set the clicked buttons's color to the selection color
                     clickedButtonComp.colors = selectedColorBlock;
 
                     selectedButton = clickedButton;
@@ -401,6 +411,7 @@ public class DynamicListManager : MonoBehaviour
 
                 if (clickedButton == selectedButton)
                 {
+                    //Double click detection
                     if (Time.time - lastClickTime <= 0.5f)
                     {
                         ChooseButtonClicked();
@@ -414,12 +425,14 @@ public class DynamicListManager : MonoBehaviour
 
                     Button clickedButtonComp = clickedButton.GetComponent<Button>();
 
+                    //Set the previous button's colors back to normal
                     if (selectedButton != null)
                     {
                         Button selectedButtonComp = selectedButton.GetComponent<Button>();
                         selectedButtonComp.colors = normalColorBlock;
                     }
 
+                    //Set the clicked buttons's color to the selection color
                     clickedButtonComp.colors = selectedColorBlock;
 
                     selectedButton = clickedButton;
@@ -429,22 +442,29 @@ public class DynamicListManager : MonoBehaviour
                 break;
         }
 
-
+        //Record the click's time
         lastClickTime = Time.time;
     }
 
+    /// <summary>
+    /// Clears the list selection and opens the new save panel.
+    /// </summary>
     public void NewSaveSlotPressed()
     {
         ClearListSelection();
         newSavePanel.SetActive(true);
     }
 
+    /// <summary>
+    /// Makes a new save.
+    /// </summary>
     public void NewSave()
     {
         Regex rgx = new Regex("[^A-Za-z0-9]");
         bool ready = true;
 
-        if (newSaveInput.text.Equals("") || newSaveInput.text == null)
+
+        if (newSaveInput.text.Equals("") || newSaveInput.text == null) //Check if the field is empty
         {
             ready = false;
             saveFeedbackRect.gameObject.SetActive(true);
@@ -452,7 +472,7 @@ public class DynamicListManager : MonoBehaviour
             saveFeedbackText.text = "Ezt a mezõt kötelezõ kitölteni";
 
         }
-        else if (rgx.IsMatch(newSaveInput.text))
+        else if (rgx.IsMatch(newSaveInput.text)) //Check for special characters
         {
             ready = false;
             saveFeedbackRect.gameObject.SetActive(true);
@@ -465,7 +485,7 @@ public class DynamicListManager : MonoBehaviour
             saveFeedbackRect.gameObject.SetActive(false);
 
 
-            if (newSaveInput.text.Length < 3)
+            if (newSaveInput.text.Length < 3) //Check for minimum length
             {
                 ready = false;
                 saveFeedbackRect.gameObject.SetActive(true);
@@ -478,7 +498,7 @@ public class DynamicListManager : MonoBehaviour
         {
 
 
-            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text))
+            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Ceck if the name is taken
             {
                 saveFeedbackRect.gameObject.SetActive(true);
                 saveFeedbackRect.color = Color.red;
@@ -490,7 +510,7 @@ public class DynamicListManager : MonoBehaviour
 
 
                 string saveName = newSaveInput.text;
-                if (gameController.Save(saveName, saveName, false))
+                if (gameController.Save(saveName, saveName, false)) //Try to make a non-overwriting save
                 {
                     newSaveInput.text = "";
                     newSavePanel.SetActive(false);
@@ -518,6 +538,11 @@ public class DynamicListManager : MonoBehaviour
         }
     }
 
+
+    /// <summary>
+    /// Called by the choose button, does actions according to the current DynamicListType.
+    /// </summary>
+    /// <description>If it's a save list overwrites the selected save, if it's a load list loads the selected save.</description>
     public void ChooseButtonClicked()
     {
         switch (listType)
