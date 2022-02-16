@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Experimental.Rendering.Universal;
 
 /// <summary>
-/// Logic for the doors
+/// Logic for the doors.
 /// </summary>
 /// 
 public class Door : MonoBehaviour

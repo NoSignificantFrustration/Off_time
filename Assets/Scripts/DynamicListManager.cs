@@ -542,7 +542,6 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>
     /// Called by the choose button, does actions according to the current DynamicListType.
     /// </summary>
-    /// <description>If it's a save list overwrites the selected save, if it's a load list loads the selected save.</description>
     public void ChooseButtonClicked()
     {
         switch (listType)
@@ -566,7 +565,10 @@ public class DynamicListManager : MonoBehaviour
                 break;
         }
     }
-
+    
+    /// <summary>
+    /// Clears the selected item.
+    /// </summary>
     public void ClearListSelection()
     {
         if (selectedButton != null)
@@ -580,23 +582,34 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Opens the specified panel.
+    /// </summary>
+    /// <param name="panel">Panel to open</param>
     public void OpenPanel(GameObject panel)
     {
         panel.SetActive(true);
 
     }
 
+    /// <summary>
+    /// Closes the specified panel.
+    /// </summary>
+    /// <param name="panel">Panel to close</param>
     public void ClosePanel(GameObject panel)
     {
         panel.SetActive(false);
     }
 
+    /// <summary>
+    /// Overwrites the selected save.
+    /// </summary>
     private void OverwriteSelectedSave()
     {
-
+        //Get the SaveGameInfo that corresponds to the clicked button
         SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
 
-        if (gameController.Save(saveInfo.saveTitle, saveInfo.fileName, true))
+        if (gameController.Save(saveInfo.saveTitle, saveInfo.fileName, true)) //Try to do an overwriting save
         {
             confirmationPanel.SetActive(false);
             feedbackTexts[0].text = "Mentés";
@@ -618,6 +631,9 @@ public class DynamicListManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deletes the selected item from the list.
+    /// </summary>
     public void DeleteButtonClicked()
     {
         switch (listType)
@@ -649,16 +665,22 @@ public class DynamicListManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deletes the selected save.
+    /// </summary>
     private void DeleteSelectedSave()
     {
         confirmationPanel.SetActive(false);
 
+        //Get the SaveGameInfo that corresponds to the clicked button
         SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
 
-        if (FileManager.DeleteFile(FileManager.saveDirectory, saveInfo.fileName, ".save"))
+        if (FileManager.DeleteFile(FileManager.saveDirectory, saveInfo.fileName, ".save")) //Try to delete the file
         {
 
+            //Delete save record from database
             databaseManager.DeleteSave(saveInfo.saveTitle);
+            //Reload the list
             LoadButtons();
             if (saveInfo.saveTitle == PlaySession.saveInfo.saveTitle)
             {
@@ -684,22 +706,28 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
-
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    /// <summary>
+    /// Closes the current menu.
+    /// </summary>
     public void Close()
     {
         uiEventHandler.CloseMenu();
     }
 
+    /// <summary>
+    /// Struct that turns other data types into flat string arrays.
+    /// </summary>
     public struct ListMemberText
     {
+        /// <summary>
+        /// The resulting string array.
+        /// </summary>
         public string[] textContents;
 
+        /// <summary>
+        /// Turns the provided into a string array.
+        /// </summary>
+        /// <param name="saveGameInfo">Source SaveGameInfo</param>
         public ListMemberText(SaveGameInfo saveGameInfo)
         {
             TimeSpan time = TimeSpan.FromSeconds(saveGameInfo.elapsedTime);
@@ -709,15 +737,28 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Struct containing information about how the header and how columns should be contructed.
+    /// </summary>
     public struct ListHeaderProperty
     {
+        /// <summary>Column header names</summary>
         public string[] colHeaderNames;
+        /// <summary>Database field names</summary>
         public string[] colDatabaseFields;
+        /// <summary>Default sorting mode</summary>
         public bool[] defaultSortingMode; //1: ASC 0: DSC
+        /// <summary>Column anchors</summary>
         public float[] textRectAnchors;
+        /// <summary>Text fields</summary>
         public Text[] textFields;
+        /// <summary>Text anchors</summary>
         public TextAnchor[] textAnchors;
 
+        /// <summary>
+        /// Sets up column properties according to the provided DynamicListType.
+        /// </summary>
+        /// <param name="listType">List type</param>
         public ListHeaderProperty(DynamicListType listType)
         {
             switch (listType)
@@ -753,22 +794,39 @@ public class DynamicListManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// List type enum.
+    /// </summary>
     public enum DynamicListType
     {
         SaveList, LoadList
     }
 }
 
+/// <summary>
+/// Struct containing basic information about a saved game.
+/// </summary>
 public struct SaveGameInfo
 {
+    /// <summary>Title</summary>
     public string saveTitle;
+    /// <summary>Difficulty</summary>
     public int difficulty;
+    /// <summary>Level name</summary>
     public string levelName;
+    /// <summary>File name</summary>
     public string fileName;
+    /// <summary>Number of moves made</summary>
     public int moves;
+    /// <summary>Time the save was made</summary>
     public DateTime saveTime;
+    /// <summary>Time spent in game</summary>
     public float elapsedTime;
 
+    /// <summary>
+    /// Initialises a new SaveGameInfo with the provided level name.
+    /// </summary>
+    /// <param name="levelName">Level name</param>
     public SaveGameInfo(string levelName)
     {
         saveTitle = null;
