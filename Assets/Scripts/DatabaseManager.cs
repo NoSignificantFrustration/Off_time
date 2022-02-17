@@ -297,7 +297,7 @@ public class DatabaseManager : MonoBehaviour
     /// </summary>
     /// <returns>A list of SaveGameInfos</returns>
     /// <seealso cref="SaveGameInfo"/>
-    public List<SaveGameInfo> GetSavedGames()
+    public List<SaveGameInfo> GetSavedGames(string orderByCol, bool sortingMode)
     {
         List<SaveGameInfo> saveGameInfos = new List<SaveGameInfo>();
 
@@ -306,7 +306,8 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = $"SELECT id, title, difficulty, levelName, fileName, moves, CAST(savetime AS nvarchar(10)) AS 'savetime', elapsedTime FROM saves WHERE userID = '{PlaySession.userID}'";
+                string mode = sortingMode ? "ASC" : "DESC";
+                command.CommandText = $"SELECT id, title, difficulty, levelName, fileName, moves, CAST(savetime AS nvarchar(10)) AS 'savetime', elapsedTime FROM saves WHERE userID = '{PlaySession.userID}' ORDER BY {orderByCol} {mode}";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())

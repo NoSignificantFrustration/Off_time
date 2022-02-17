@@ -75,8 +75,11 @@ public class DynamicListManager : MonoBehaviour
     private GameObject selectedButton;
     /// <summary>Time of the last click on a list list member</summary>
     private float lastClickTime;
-    /// <summary>The currently selected header column</summary>
-    public GameObject selectedHeader;
+    private List<GameObject> headerButtons = new List<GameObject>();
+    /// <summary>The currently selected column</summary>
+    private int selectedHeader;
+    /// <summary>Sorting mode</summary>
+    private bool sortingMode;
     /// <summary>The UI element the list is confined to</summary>
     private GameObject content;
     /// <summary>The list's ContentSizeFitter</summary>
@@ -134,6 +137,10 @@ public class DynamicListManager : MonoBehaviour
             GameObject.Destroy(child.gameObject);
         }
 
+        headerButtons = new List<GameObject>();
+        selectedHeader = new int();
+        
+
         //Initialise a ListHeaderProperty corresponding to the current DynamicListType
         headerProperty = new ListHeaderProperty(listType);
         //Create header members according to the ListHeaderProperty
@@ -142,7 +149,8 @@ public class DynamicListManager : MonoBehaviour
             GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
             button.name = i.ToString();
             Button bComp = button.GetComponent<Button>();
-            bComp.onClick.AddListener(delegate { HeaderElementPressed(button); });
+            int temp = i;
+            bComp.onClick.AddListener(delegate { HeaderElementPressed(temp); });
             headerProperty.textFields[i] = button.GetComponentInChildren<Text>();
             headerProperty.textFields[i].text = headerProperty.colHeaderNames[i];
             headerProperty.textFields[i].fontSize = headerFontSize;
@@ -157,6 +165,19 @@ public class DynamicListManager : MonoBehaviour
             rectTransform.sizeDelta = Vector2.zero;
             rectTransform.offsetMax = Vector2.zero;
             rectTransform.offsetMin = Vector2.zero;
+            headerButtons.Add(button);
+        }
+
+        switch (listType)
+        {
+            case DynamicListType.SaveList:
+                HeaderElementPressed(headerButtons.Count - 1);
+                break;
+            case DynamicListType.LoadList:
+                HeaderElementPressed(headerButtons.Count - 1);
+                break;
+            default:
+                break;
         }
     }
 
@@ -171,7 +192,7 @@ public class DynamicListManager : MonoBehaviour
             GameObject.Destroy(child.gameObject);
         }
 
-
+        listMemberButtons = new List<GameObject>();
 
         Button chooseButtonComp = chooseButton.GetComponent<Button>();
         Button deleteButtonComp = deleteButton.GetComponent<Button>();
@@ -200,16 +221,20 @@ public class DynamicListManager : MonoBehaviour
                 textComponent.fontSize = (int)listMemberHeight - 10;
                 listMemberButtons.Add(newSaveButton);
 
+                
+
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames();
+                saveGameInfos = databaseManager.GetSavedGames("savetime", false);
 
                 //Set up a button for each SaveGameInfo
+                
                 for (int i = 0; i < saveGameInfos.Count; i++)
                 {
                     GameObject button = CreateListMember();
 
                     Button bComponent = button.GetComponent<Button>();
-                    bComponent.onClick.AddListener(delegate { ListElementPressed(button); });
+                    int temp = i;
+                    bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
                     button.name = i.ToString();
 
                     //Set up the text fields of the button
@@ -230,7 +255,7 @@ public class DynamicListManager : MonoBehaviour
                 chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames();
+                saveGameInfos = databaseManager.GetSavedGames("savetime", false);
 
                 //Set up a button for each SaveGameInfo
                 for (int i = 0; i < saveGameInfos.Count; i++)
@@ -238,7 +263,8 @@ public class DynamicListManager : MonoBehaviour
                     GameObject button = CreateListMember();
 
                     Button bComponent = button.GetComponent<Button>();
-                    bComponent.onClick.AddListener(delegate { ListElementPressed(button); });
+                    int temp = i;
+                    bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
                     button.name = i.ToString();
                     //Set up the text fields of the button
                     CreateTextFields(button, i);
@@ -357,17 +383,36 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>
     /// Sorts the list according to the pressed button's column.
     /// </summary>
-    /// <param name="button">Pressed button</param>
-    private void HeaderElementPressed(GameObject button)
+    /// <param name="button">Pressed button index</param>
+    public void HeaderElementPressed(int index)
     {
+        if (index == selectedHeader)
+        {
+            sortingMode = !sortingMode;
+        }
+        else
+        {
+            Button clickedButtonComp = headerButtons[index].GetComponent<Button>();
+
+            //Set the previous button's colors back to normal
+            
+             Button selectedButtonComp = headerButtons[index].GetComponent<Button>();
+             selectedButtonComp.colors = normalColorBlock;
+            
+
+            //Set the clicked buttons's color to the selection color
+            clickedButtonComp.colors = selectedColorBlock;
+
+            selectedHeader = index;
+        }
         LoadButtons();
     }
 
     /// <summary>
     /// Selects the clicked button, also detects double clicks and calls ChoseButtonClicked().
     /// </summary>
-    /// <param name="clickedButton">Pressed button</param>
-    private void ListElementPressed(GameObject clickedButton)
+    /// <param name="clickedButton">Pressed button index</param>
+    private void ListElementPressed(int index)
     {
 
         switch (listType)
@@ -376,7 +421,7 @@ public class DynamicListManager : MonoBehaviour
                 chooseButton.GetComponent<Button>().interactable = true;
                 deleteButton.GetComponent<Button>().interactable = true;
 
-                if (clickedButton == selectedButton)
+                if (listMemberButtons[index] == selectedButton)
                 {
                     //Double click detection
                     if (Time.time - lastClickTime <= 0.5f)
@@ -390,7 +435,7 @@ public class DynamicListManager : MonoBehaviour
                 {
 
 
-                    Button clickedButtonComp = clickedButton.GetComponent<Button>();
+                    Button clickedButtonComp = listMemberButtons[index].GetComponent<Button>();
 
                     //Set the previous button's colors back to normal
                     if (selectedButton != null)
@@ -402,14 +447,14 @@ public class DynamicListManager : MonoBehaviour
                     //Set the clicked buttons's color to the selection color
                     clickedButtonComp.colors = selectedColorBlock;
 
-                    selectedButton = clickedButton;
+                    selectedButton = listMemberButtons[index];
                 }
                 break;
             case DynamicListType.LoadList:
                 chooseButton.GetComponent<Button>().interactable = true;
                 deleteButton.GetComponent<Button>().interactable = true;
 
-                if (clickedButton == selectedButton)
+                if (listMemberButtons[index] == selectedButton)
                 {
                     //Double click detection
                     if (Time.time - lastClickTime <= 0.5f)
@@ -423,7 +468,7 @@ public class DynamicListManager : MonoBehaviour
                 {
 
 
-                    Button clickedButtonComp = clickedButton.GetComponent<Button>();
+                    Button clickedButtonComp = listMemberButtons[index].GetComponent<Button>();
 
                     //Set the previous button's colors back to normal
                     if (selectedButton != null)
@@ -435,7 +480,7 @@ public class DynamicListManager : MonoBehaviour
                     //Set the clicked buttons's color to the selection color
                     clickedButtonComp.colors = selectedColorBlock;
 
-                    selectedButton = clickedButton;
+                    selectedButton = listMemberButtons[index];
                 }
                 break;
             default:
