@@ -82,7 +82,7 @@ public class DatabaseManager : MonoBehaviour
                             "moves INTEGER NOT NULL," +
                             "levelName VARCHAR NOT NULL," +
                             "fileName VARCHAR NOT NULL," +
-                            "elapsedTime FLOAT NOT NULL," +
+                            "elapsedTime INTEGER NOT NULL," +
                             "savetime DATETIME NOT NULL," +
                             "FOREIGN KEY (userID) REFERENCES users(id))";
                         command.ExecuteNonQuery();
@@ -415,16 +415,6 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
-
-    private int TimeIntFromFloat(float f)
-    {
-        return (int)(f * 100);
-    }
-
-    private float FloatFromTimeInt(int timeInt)
-    {
-        return (float)timeInt / 100f;
-    }
 
     /// <summary>
     /// Deletes the user's save record with the specified name.

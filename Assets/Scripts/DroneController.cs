@@ -36,6 +36,7 @@ public class DroneController : MonoBehaviour, ISaveable
     {
         controls = new PlayerInputAsset();
         rb = GetComponent<Rigidbody2D>();
+        
         sr = GetComponent<SpriteRenderer>();
         controls.Player.Click.performed += Click;
         
@@ -81,10 +82,7 @@ public class DroneController : MonoBehaviour, ISaveable
         if (!UIEventHandler.isPaused)
         {
             movementInput = controls.Player.Movement.ReadValue<Vector2>();
-            if (movementInput.magnitude > 0)
-            {
-                transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, movementInput), Time.fixedDeltaTime * 10);
-            }
+            
         }
         
 
@@ -98,6 +96,15 @@ public class DroneController : MonoBehaviour, ISaveable
     {
 
         rb.velocity = movementInput * Time.fixedDeltaTime * speedMultiplier;
+        if (movementInput.magnitude > 0)
+        {
+            float angleDiff = Vector3.Angle(Vector3.up, (Vector3)movementInput);
+            Vector3 cross = Vector3.Cross(transform.up, (Vector3)movementInput);
+
+            rb.MoveRotation(Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, movementInput), Time.fixedDeltaTime * 10));
+            rb.WakeUp();
+
+        }
     }
 
 

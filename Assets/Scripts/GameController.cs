@@ -26,7 +26,7 @@ public class GameController : MonoBehaviour
         {
             item.Startup();
         }
-
+        player = GameObject.FindGameObjectsWithTag("Player")[0];
     }
 
     public List<ISaveable> GetSaveables()
