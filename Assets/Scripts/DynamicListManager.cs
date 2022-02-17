@@ -139,7 +139,7 @@ public class DynamicListManager : MonoBehaviour
 
         headerButtons = new List<GameObject>();
         selectedHeader = new int();
-        
+
 
         //Initialise a ListHeaderProperty corresponding to the current DynamicListType
         headerProperty = new ListHeaderProperty(listType);
@@ -221,13 +221,13 @@ public class DynamicListManager : MonoBehaviour
                 textComponent.fontSize = (int)listMemberHeight - 10;
                 listMemberButtons.Add(newSaveButton);
 
-                
+
 
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames("savetime", false);
+                saveGameInfos = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
                 //Set up a button for each SaveGameInfo
-                
+
                 for (int i = 0; i < saveGameInfos.Count; i++)
                 {
                     GameObject button = CreateListMember();
@@ -255,7 +255,7 @@ public class DynamicListManager : MonoBehaviour
                 chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames("savetime", false);
+                saveGameInfos = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
                 //Set up a button for each SaveGameInfo
                 for (int i = 0; i < saveGameInfos.Count; i++)
@@ -383,7 +383,7 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>
     /// Sorts the list according to the pressed button's column.
     /// </summary>
-    /// <param name="button">Pressed button index</param>
+    /// <param name="index">Pressed button index</param>
     public void HeaderElementPressed(int index)
     {
         if (index == selectedHeader)
@@ -393,12 +393,14 @@ public class DynamicListManager : MonoBehaviour
         else
         {
             Button clickedButtonComp = headerButtons[index].GetComponent<Button>();
-
+            sortingMode = headerProperty.defaultSortingMode[index];
             //Set the previous button's colors back to normal
-            
-             Button selectedButtonComp = headerButtons[index].GetComponent<Button>();
-             selectedButtonComp.colors = normalColorBlock;
-            
+
+            Button selectedButtonComp = headerButtons[selectedHeader].GetComponent<Button>();
+            selectedButtonComp.colors = normalColorBlock;
+
+
+
 
             //Set the clicked buttons's color to the selection color
             clickedButtonComp.colors = selectedColorBlock;
@@ -411,7 +413,7 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>
     /// Selects the clicked button, also detects double clicks and calls ChoseButtonClicked().
     /// </summary>
-    /// <param name="clickedButton">Pressed button index</param>
+    /// <param name="index">Pressed button index</param>
     private void ListElementPressed(int index)
     {
 
@@ -610,7 +612,7 @@ public class DynamicListManager : MonoBehaviour
                 break;
         }
     }
-    
+
     /// <summary>
     /// Clears the selected item.
     /// </summary>
@@ -811,7 +813,7 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.SaveList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
                     colDatabaseFields = new string[] { "title", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, true, true, false, false };
+                    defaultSortingMode = new bool[] { true, true, true, false, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
@@ -819,7 +821,7 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.LoadList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
                     colDatabaseFields = new string[] { "title", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, true, true, false, false };
+                    defaultSortingMode = new bool[] { true, true, true, false, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };

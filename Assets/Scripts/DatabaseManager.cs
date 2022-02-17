@@ -321,7 +321,7 @@ public class DatabaseManager : MonoBehaviour
                         saveInfo.fileName = reader["fileName"].ToString();
                         saveInfo.moves = int.Parse(reader["moves"].ToString());
                         saveInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
-                        saveInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString());
+                        saveInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString()) / 100f;
                         saveGameInfos.Add(saveInfo);
                         //"yyyy-MM-dd HH:mm:ss"
                     }
@@ -388,7 +388,7 @@ public class DatabaseManager : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandText = $"INSERT INTO saves (userID, title, difficulty, moves, levelName, fileName, elapsedTime, savetime) VALUES" +
-                    $"('{PlaySession.userID}', '{PlaySession.saveInfo.saveTitle}', '{PlaySession.saveInfo.difficulty}', '{PlaySession.saveInfo.moves}', '{PlaySession.saveInfo.levelName}', '{PlaySession.saveInfo.fileName}', '{PlaySession.saveInfo.elapsedTime}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
+                    $"('{PlaySession.userID}', '{PlaySession.saveInfo.saveTitle}', '{PlaySession.saveInfo.difficulty}', '{PlaySession.saveInfo.moves}', '{PlaySession.saveInfo.levelName}', '{PlaySession.saveInfo.fileName}', '{(int)(PlaySession.saveInfo.elapsedTime * 100f)}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
                 command.ExecuteNonQuery();
             }
             connection.Close();
@@ -407,12 +407,23 @@ public class DatabaseManager : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 command.CommandText = $"UPDATE saves SET " +
-                    $"difficulty = '{PlaySession.saveInfo.difficulty}', moves = '{PlaySession.saveInfo.moves}', levelName = '{PlaySession.saveInfo.levelName}', elapsedTime = '{PlaySession.saveInfo.elapsedTime}', savetime = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}'" +
+                    $"difficulty = '{PlaySession.saveInfo.difficulty}', moves = '{PlaySession.saveInfo.moves}', levelName = '{PlaySession.saveInfo.levelName}', elapsedTime = '{(int)(PlaySession.saveInfo.elapsedTime * 100f)}', savetime = '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}'" +
                     $"WHERE userID = '{PlaySession.userID}' AND title = '{PlaySession.saveInfo.saveTitle}'";
                 command.ExecuteNonQuery();
             }
             connection.Close();
         }
+    }
+
+
+    private int TimeIntFromFloat(float f)
+    {
+        return (int)(f * 100);
+    }
+
+    private float FloatFromTimeInt(int timeInt)
+    {
+        return (float)timeInt / 100f;
     }
 
     /// <summary>
