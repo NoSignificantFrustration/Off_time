@@ -15,7 +15,7 @@ public class DroneController : MonoBehaviour, ISaveable
     /// <summary>Movement speed multiplier</summary>
     [SerializeField] private float speedMultiplier;
     /// <summary>Main UIEventHandler</summary>
-    [SerializeField] private UIEventHandler quizHandler;
+    [SerializeField] private UIEventHandler uiEventHandler;
     /// <summary>Movement direction</summary>
     private Vector2 movementInput;
     /// <summary>Input scheme</summary>
@@ -54,7 +54,7 @@ public class DroneController : MonoBehaviour, ISaveable
             return;
         }
 
-
+        //Click raycast check
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
         RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
         //If the raycast hit and the hit object can be clicked do exactly that
@@ -74,7 +74,7 @@ public class DroneController : MonoBehaviour, ISaveable
     }
 
     /// <summary>
-    /// Gets the current movement input and rotates the transform to face it's direction every frame.
+    /// Gets the current movement input.
     /// </summary>
     // Update is called once per frame
     void Update()
@@ -90,19 +90,16 @@ public class DroneController : MonoBehaviour, ISaveable
     }
 
     /// <summary>
-    /// Sets the rigidbody's velocity 50 times per second.
+    /// Sets the rigidbody's velocity and rotation 50 times per second.
     /// </summary>
     private void FixedUpdate()
     {
-
+        //Calculate the desired velocity
         rb.velocity = movementInput * Time.fixedDeltaTime * speedMultiplier;
         if (movementInput.magnitude > 0)
         {
-            float angleDiff = Vector3.Angle(Vector3.up, (Vector3)movementInput);
-            Vector3 cross = Vector3.Cross(transform.up, (Vector3)movementInput);
-
+            //Smoothly rotate the rigidbody
             rb.MoveRotation(Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(Vector3.forward, movementInput), Time.fixedDeltaTime * 10));
-            rb.WakeUp();
 
         }
     }
@@ -114,7 +111,7 @@ public class DroneController : MonoBehaviour, ISaveable
     /// <param name="nodeBlocker">The NodeBlocker that was clicked</param>
     public void StartQuiz(NodeBlocker nodeBlocker)
     {
-        if (quizHandler == null)
+        if (uiEventHandler == null)
         {
             Debug.LogWarning("No quizhandler found");
             return;
@@ -123,7 +120,7 @@ public class DroneController : MonoBehaviour, ISaveable
         isSolvingPuzzle = true;
         blocker = nodeBlocker;
 
-        quizHandler.StartQuiz(this);
+        uiEventHandler.StartQuiz(this);
 
 
     }

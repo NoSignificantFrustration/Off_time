@@ -1,13 +1,8 @@
-using Mono.Data.Sqlite;
 using System;
-using System.Collections;
 using System.Collections.Generic;
-using System.Data;
 using System.Globalization;
 using System.IO;
 using System.Text.RegularExpressions;
-using UnityEngine;
-using UnityEngine.UI;
 
 /// <summary>
 /// Class that handles database operations.
@@ -86,6 +81,15 @@ public class DatabaseManager : MonoBehaviour
                             "savetime DATETIME NOT NULL," +
                             "FOREIGN KEY (userID) REFERENCES users(id))";
                         command.ExecuteNonQuery();
+                        command.CommandText = "CREATE TABLE wins(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                            "userID INTEGER NOT NULL, " +
+                            "difficulty INTEGER(1) NOT NULL, " +
+                            "moves INTEGER NOT NULL, " +
+                            "levelName VARCHAR NOT NULL, " +
+                            "elapsedTime FLOAT NOT NULL, " +
+                            "savetime DATETIME NOT NULL, " +
+                            "FOREIGN KEY(userID) REFERENCES users(id))";
+                        command.ExecuteNonQuery();
                     }
                     connection.Close();
                 }
@@ -93,10 +97,10 @@ public class DatabaseManager : MonoBehaviour
             else
             {
                 Debug.LogError("Database is missing");
-                
+
             }
         }
-        
+
     }
 
     /// <summary>
@@ -125,7 +129,7 @@ public class DatabaseManager : MonoBehaviour
                     }
                     reader.Close();
                 }
-                
+
             }
             connection.Close();
         }
@@ -138,7 +142,7 @@ public class DatabaseManager : MonoBehaviour
     /// <param name="input">Query text</param>
     public void RunQuery(string input)
     {
-        
+
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
             connection.Open();
@@ -147,7 +151,7 @@ public class DatabaseManager : MonoBehaviour
                 command.CommandText = input;
                 command.ExecuteNonQuery();
 
-     
+
 
             }
             connection.Close();
@@ -185,7 +189,7 @@ public class DatabaseManager : MonoBehaviour
                     dat.bad_answers[1] = reader["bad_answer2"].ToString();
                     dat.bad_answers[2] = reader["bad_answer3"].ToString();
                     reader.Close();
-                    
+
                 }
 
             }
@@ -212,7 +216,7 @@ public class DatabaseManager : MonoBehaviour
             using (SqliteCommand command = connection.CreateCommand())
             {
                 //Check if the username is taken
-                command.CommandText = "SELECT COUNT(*) AS 'count' FROM users WHERE username='" + username +"'" ;
+                command.CommandText = "SELECT COUNT(*) AS 'count' FROM users WHERE username='" + username + "'";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())
@@ -233,8 +237,8 @@ public class DatabaseManager : MonoBehaviour
                             "('" + username + "', '" + password + "')";
                         command.ExecuteNonQuery();
                     }
-                    
-                    
+
+
 
                 }
 
@@ -438,5 +442,5 @@ public class DatabaseManager : MonoBehaviour
 
 
 
-    
+
 }

@@ -146,11 +146,13 @@ public class DynamicListManager : MonoBehaviour
         //Create header members according to the ListHeaderProperty
         for (int i = 0; i < headerProperty.textFields.Length; i++)
         {
+            //Create a new header button 
             GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
             button.name = i.ToString();
             Button bComp = button.GetComponent<Button>();
             int temp = i;
-            bComp.onClick.AddListener(delegate { HeaderElementPressed(temp); });
+            bComp.onClick.AddListener(delegate { HeaderElementPressed(temp); }); //Add listener
+            //Store reference to the new text field in the header properties
             headerProperty.textFields[i] = button.GetComponentInChildren<Text>();
             headerProperty.textFields[i].text = headerProperty.colHeaderNames[i];
             headerProperty.textFields[i].fontSize = headerFontSize;
@@ -168,6 +170,7 @@ public class DynamicListManager : MonoBehaviour
             headerButtons.Add(button);
         }
 
+        //Set default sorting column and mode
         switch (listType)
         {
             case DynamicListType.SaveList:
