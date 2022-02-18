@@ -289,9 +289,11 @@ public class DynamicListManager : MonoBehaviour
     /// <returns>The created button.</returns>
     public GameObject CreateListMember()
     {
+        //Instantiate a new button 
         GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
         RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.SetParent(content.transform);
+        rectTransform.SetParent(content.transform); 
+        //Set up the anchors
         rectTransform.anchorMin = new Vector2(0f, 1f);
         rectTransform.anchorMax = new Vector2(1f, 1f);
         rectTransform.pivot = new Vector2(0f, 1f);
@@ -321,12 +323,13 @@ public class DynamicListManager : MonoBehaviour
                 //Get the displayable text from the SaveGameInfo specified by the given index
                 listMemberText = new ListMemberText(saveGameInfos[index]);
 
-                //Create text fields acoording to the new ListMemberText
+                //Create text fields acording to the new ListMemberText
                 for (int i = 0; i < headerProperty.textFields.Length; i++)
                 {
-                    GameObject textObject = new GameObject($"ButtonTextField{i}");
+                    GameObject textObject = new GameObject($"ButtonTextField{i}"); //Create the GameObject
                     Text textComponent = textObject.AddComponent<Text>();
                     RectTransform rectTransform = textObject.GetComponent<RectTransform>();
+                    //Set up the text
                     textComponent.text = listMemberText.textContents[i];
                     textComponent.fontSize = listFontSize;
                     textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -353,9 +356,10 @@ public class DynamicListManager : MonoBehaviour
                 //Create text fields acoording to the new ListMemberText
                 for (int i = 0; i < headerProperty.textFields.Length; i++)
                 {
-                    GameObject textObject = new GameObject($"ButtonTextField{i}");
+                    GameObject textObject = new GameObject($"ButtonTextField{i}"); //Create the GameObject
                     Text textComponent = textObject.AddComponent<Text>();
                     RectTransform rectTransform = textObject.GetComponent<RectTransform>();
+                    //Set up the text
                     textComponent.text = listMemberText.textContents[i];
                     textComponent.fontSize = listFontSize;
                     textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
@@ -395,10 +399,11 @@ public class DynamicListManager : MonoBehaviour
         }
         else
         {
+            //Get the newly clicked button
             Button clickedButtonComp = headerButtons[index].GetComponent<Button>();
-            sortingMode = headerProperty.defaultSortingMode[index];
-            //Set the previous button's colors back to normal
+            sortingMode = headerProperty.defaultSortingMode[index]; //Set the new sorting mode
 
+            //Set the previous button's colors back to normal
             Button selectedButtonComp = headerButtons[selectedHeader].GetComponent<Button>();
             selectedButtonComp.colors = normalColorBlock;
 
@@ -410,7 +415,7 @@ public class DynamicListManager : MonoBehaviour
 
             selectedHeader = index;
         }
-        LoadButtons();
+        LoadButtons(); //Reload the list
     }
 
     /// <summary>
@@ -548,7 +553,7 @@ public class DynamicListManager : MonoBehaviour
         {
 
 
-            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Ceck if the name is taken
+            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Check if the name is taken
             {
                 saveFeedbackRect.gameObject.SetActive(true);
                 saveFeedbackRect.color = Color.red;

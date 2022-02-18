@@ -3,16 +3,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// Logic for the node blockers.
+/// </summary>
+/// <seealso cref="IConnectable"/>
+/// <seealso cref="ISaveable"/>
+/// <seealso cref="PowerConnection"/>
+/// <seealso cref="PowerNode"/>
 public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
 {
+    /// <summary>The input PowerConnection</summary>
     [SerializeField] private PowerConnection input;
+    /// <summary>The node this blocker is latched onto</summary>
     [SerializeField] private PowerNode output;
+    /// <summary>The range from this blocker can be accessed</summary>
     [SerializeField] private float range;
+    /// <summary>The blocker's sprites</summary>
     [SerializeField] private Sprite[] sprites;
+    /// <summary></summary>
     [SerializeField] private bool isActivated = false;
+    /// <summary></summary>
     [SerializeField] private bool isLocked = true;
+    /// <summary></summary>
     [SerializeField] private string uid;
+    /// <summary></summary>
     private bool in_range;
+    /// <summary></summary>
     private SpriteRenderer sr;
 
     public void LoadSprite()
