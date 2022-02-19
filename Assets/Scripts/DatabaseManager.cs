@@ -1,8 +1,12 @@
 using System;
+using Mono.Data.Sqlite;
 using System.Collections.Generic;
 using System.Globalization;
+using System.Data;
 using System.IO;
 using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Class that handles database operations.
@@ -301,9 +305,9 @@ public class DatabaseManager : MonoBehaviour
     /// </summary>
     /// <returns>A list of SaveGameInfos</returns>
     /// <seealso cref="SaveGameInfo"/>
-    public List<SaveGameInfo> GetSavedGames(string orderByCol, bool sortingMode)
+    public List<object> GetSavedGames(string orderByCol, bool sortingMode)
     {
-        List<SaveGameInfo> saveGameInfos = new List<SaveGameInfo>();
+        List<object> saveGameInfos = new List<object>();
 
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
         {
@@ -439,8 +443,60 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Adds a win record to database.
+    /// </summary>
+    public void AddWin()
+    {
 
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"INSERT INTO wins (userID, difficulty, moves, levelName, elapsedTime, savetime) VALUES" +
+                    $"('{PlaySession.userID}', '{PlaySession.saveInfo.difficulty}', '{PlaySession.saveInfo.moves}', '{PlaySession.saveInfo.levelName}', '{(int)(PlaySession.saveInfo.elapsedTime * 100f)}', '{DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss")}')";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
 
+    public List<object> GetLeaderboard(string orderByCol, bool sortingMode)
+    {
+        List<object> winInfos = new List<object>();
 
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                string mode = sortingMode ? "ASC" : "DESC";
+                command.CommandText = $"SELECT users.username, difficulty, levelName, moves, CAST(savetime AS nvarchar(10)) AS 'savetime', elapsedTime FROM wins INNER JOIN users ON users.id = userID ORDER BY {orderByCol} {mode} ";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        WinInfo winInfo = new WinInfo();
+                        winInfo.username = reader["username"].ToString();
+                        winInfo.difficulty = int.Parse(reader["difficulty"].ToString());
+                        winInfo.levelName = reader["levelName"].ToString();
+                        winInfo.moves = int.Parse(reader["moves"].ToString());
+                        winInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
+                        winInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString()) / 100f;
+                        winInfos.Add(winInfo);
+                        //"yyyy-MM-dd HH:mm:ss"
+                    }
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
+
+        return winInfos;
+    }
 
 }

@@ -78,6 +78,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         
         if (isActivated && isLocked && in_range)
         {
+            PlaySession.saveInfo.moves++;
             drone.StartQuiz(this);
         }
     }

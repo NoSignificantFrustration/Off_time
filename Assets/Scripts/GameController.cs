@@ -9,7 +9,7 @@ using UnityEngine;
 public class GameController : MonoBehaviour
 {
     /// <summary>Database manager</summary>
-    [SerializeField] private DatabaseManager databaseManager;
+    [SerializeField] public static DatabaseManager databaseManager;
     /// <summary>References to all the nodes</summary>
     private static GameObject[] nodes;
     /// <summary>References to all the blockers</summary>

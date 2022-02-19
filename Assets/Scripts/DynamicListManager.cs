@@ -13,6 +13,7 @@ using UnityEngine.UI;
 /// <seealso cref="DynamicListType"/>
 /// <seealso cref="ListHeaderProperty"/>
 /// <seealso cref="SaveGameInfo"/>
+/// <seealso cref="WinInfo"/>
 public class DynamicListManager : MonoBehaviour
 {
     /// <summary>The level's GameController</summary>
@@ -70,11 +71,12 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>The generated buttons</summary>
     private List<GameObject> listMemberButtons = new List<GameObject>();
     /// <summary>The SaveGameInfos that belong to the list members</summary>
-    private List<SaveGameInfo> saveGameInfos;
+    private List<object> listMemberDatas;
     /// <summary>The currently selected button</summary>
     private GameObject selectedButton;
     /// <summary>Time of the last click on a list list member</summary>
     private float lastClickTime;
+    /// <summary>Header element buttons</summary>
     private List<GameObject> headerButtons = new List<GameObject>();
     /// <summary>The currently selected column</summary>
     private int selectedHeader;
@@ -86,6 +88,7 @@ public class DynamicListManager : MonoBehaviour
     private ContentSizeFitter contentFitter;
 
 
+
     /// <summary>
     /// Gets references when the script is loaded.
     /// </summary>
@@ -94,7 +97,7 @@ public class DynamicListManager : MonoBehaviour
         content = gameObject.GetComponent<ScrollRect>().content.gameObject;
         contentFitter = content.GetComponent<ContentSizeFitter>();
         normalColorBlock = buttonPrefab.GetComponent<Button>().colors;
-        saveGameInfos = new List<SaveGameInfo>();
+        listMemberDatas = new List<object>();
         saveFeedbackText = saveFeedbackRect.GetComponentInChildren<Text>();
         textColor = buttonPrefab.GetComponentInChildren<Text>().color;
     }
@@ -179,6 +182,9 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.LoadList:
                 HeaderElementPressed(headerButtons.Count - 1);
                 break;
+            case DynamicListType.LeaderboardList:
+                HeaderElementPressed(headerButtons.Count - 1);
+                break;
             default:
                 break;
         }
@@ -210,6 +216,7 @@ public class DynamicListManager : MonoBehaviour
                 deleteButtonComp.interactable = false;
 
                 //Set up choose button
+                chooseButton.SetActive(true);
                 chooseButton.GetComponentInChildren<Text>().text = "Mentés";
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
@@ -227,23 +234,8 @@ public class DynamicListManager : MonoBehaviour
 
 
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
+                listMemberDatas = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
-                //Set up a button for each SaveGameInfo
-
-                for (int i = 0; i < saveGameInfos.Count; i++)
-                {
-                    GameObject button = CreateListMember();
-
-                    Button bComponent = button.GetComponent<Button>();
-                    int temp = i;
-                    bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
-                    button.name = i.ToString();
-
-                    //Set up the text fields of the button
-                    CreateTextFields(button, i);
-                    listMemberButtons.Add(button);
-                }
                 break;
             case DynamicListType.LoadList:
 
@@ -252,31 +244,43 @@ public class DynamicListManager : MonoBehaviour
                 deleteButtonComp.interactable = false;
 
                 //Set up choose button
+                chooseButton.SetActive(true);
                 chooseButton.GetComponentInChildren<Text>().text = "Betöltés";
                 chooseButtonComp.onClick.RemoveAllListeners();
                 chooseButtonComp.interactable = false;
                 chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
 
                 //Get the user's saves from the database
-                saveGameInfos = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
+                listMemberDatas = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
-                //Set up a button for each SaveGameInfo
-                for (int i = 0; i < saveGameInfos.Count; i++)
-                {
-                    GameObject button = CreateListMember();
+                break;
+            case DynamicListType.LeaderboardList:
 
-                    Button bComponent = button.GetComponent<Button>();
-                    int temp = i;
-                    bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
-                    button.name = i.ToString();
-                    //Set up the text fields of the button
-                    CreateTextFields(button, i);
-                    listMemberButtons.Add(button);
-                }
+                //Disable choose and delete buttons
+                chooseButton.SetActive(false);
+                deleteButton.SetActive(false);
+
+                //Get the leaderboard from database
+                listMemberDatas = databaseManager.GetLeaderboard(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
+
                 break;
             default:
                 deleteButton.SetActive(false);
                 break;
+        }
+
+        //Set up a button for each listMemberData
+        for (int i = 0; i < listMemberDatas.Count; i++)
+        {
+            GameObject button = CreateListMember();
+
+            Button bComponent = button.GetComponent<Button>();
+            int temp = i;
+            bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
+            button.name = i.ToString();
+            //Set up the text fields of the button
+            CreateTextFields(button, i);
+            listMemberButtons.Add(button);
         }
 
         //Force an update on the ContentSizeFitter to fit all list members in the scroll box
@@ -310,7 +314,7 @@ public class DynamicListManager : MonoBehaviour
     /// </summary>
     /// <param name="button">Button</param>
     /// <param name="index">Data index</param>
-    public void CreateTextFields(GameObject button, int index)
+    private void CreateTextFields(GameObject button, int index)
     {
         //Destroy the text field the prefab already has
         Destroy(button.transform.GetChild(0).gameObject);
@@ -321,68 +325,50 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.SaveList:
 
                 //Get the displayable text from the SaveGameInfo specified by the given index
-                listMemberText = new ListMemberText(saveGameInfos[index]);
-
-                //Create text fields acording to the new ListMemberText
-                for (int i = 0; i < headerProperty.textFields.Length; i++)
-                {
-                    GameObject textObject = new GameObject($"ButtonTextField{i}"); //Create the GameObject
-                    Text textComponent = textObject.AddComponent<Text>();
-                    RectTransform rectTransform = textObject.GetComponent<RectTransform>();
-                    //Set up the text
-                    textComponent.text = listMemberText.textContents[i];
-                    textComponent.fontSize = listFontSize;
-                    textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                    textComponent.alignment = headerProperty.textAnchors[i];
-                    textComponent.color = textColor;
-                    rectTransform.SetParent(button.transform);
-                    //Set up the anchors
-                    rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
-                    rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
-                    //Set up the transform
-                    rectTransform.pivot = new Vector2(0f, 1f);
-                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
-                    rectTransform.localPosition = Vector3.zero;
-                    rectTransform.sizeDelta = Vector2.zero;
-                    rectTransform.offsetMax = Vector2.zero;
-                    rectTransform.offsetMin = Vector2.zero;
-                }
+                listMemberText = new ListMemberText((SaveGameInfo)listMemberDatas[index]);
+               
                 break;
             case DynamicListType.LoadList:
 
                 //Get the displayable text from the SaveGameInfo specified by the given index
-                listMemberText = new ListMemberText(saveGameInfos[index]);
+                listMemberText = new ListMemberText((SaveGameInfo)listMemberDatas[index]);
 
-                //Create text fields acoording to the new ListMemberText
-                for (int i = 0; i < headerProperty.textFields.Length; i++)
-                {
-                    GameObject textObject = new GameObject($"ButtonTextField{i}"); //Create the GameObject
-                    Text textComponent = textObject.AddComponent<Text>();
-                    RectTransform rectTransform = textObject.GetComponent<RectTransform>();
-                    //Set up the text
-                    textComponent.text = listMemberText.textContents[i];
-                    textComponent.fontSize = listFontSize;
-                    textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
-                    textComponent.alignment = headerProperty.textAnchors[i];
-                    textComponent.color = textColor;
-                    rectTransform.SetParent(button.transform);
-                    //Set up the anchors
-                    rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
-                    rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
-                    //Set up the transform
-                    rectTransform.pivot = new Vector2(0f, 1f);
-                    rectTransform.localScale = new Vector3(1f, 1f, 1f);
-                    rectTransform.localPosition = Vector3.zero;
-                    rectTransform.sizeDelta = Vector2.zero;
-                    rectTransform.offsetMax = Vector2.zero;
-                    rectTransform.offsetMin = Vector2.zero;
-                }
+                break;
+            case DynamicListType.LeaderboardList:
+
+                //Get the displayable text from the SaveGameInfo specified by the given index
+                listMemberText = new ListMemberText((WinInfo)listMemberDatas[index]);
+
                 break;
             default:
+                listMemberText = new ListMemberText((SaveGameInfo)listMemberDatas[index]);
                 break;
         }
 
-
+        //Create text fields acording to the new ListMemberText
+        for (int i = 0; i < headerProperty.textFields.Length; i++)
+        {
+            GameObject textObject = new GameObject($"ButtonTextField{i}"); //Create the GameObject
+            Text textComponent = textObject.AddComponent<Text>();
+            RectTransform rectTransform = textObject.GetComponent<RectTransform>();
+            //Set up the text
+            textComponent.text = listMemberText.textContents[i];
+            textComponent.fontSize = listFontSize;
+            textComponent.font = Resources.GetBuiltinResource<Font>("Arial.ttf");
+            textComponent.alignment = headerProperty.textAnchors[i];
+            textComponent.color = textColor;
+            rectTransform.SetParent(button.transform);
+            //Set up the anchors
+            rectTransform.anchorMin = new Vector2(headerProperty.textRectAnchors[i], 0f);
+            rectTransform.anchorMax = new Vector2(headerProperty.textRectAnchors[i + 1], 1f);
+            //Set up the transform
+            rectTransform.pivot = new Vector2(0f, 1f);
+            rectTransform.localScale = new Vector3(1f, 1f, 1f);
+            rectTransform.localPosition = Vector3.zero;
+            rectTransform.sizeDelta = Vector2.zero;
+            rectTransform.offsetMax = Vector2.zero;
+            rectTransform.offsetMin = Vector2.zero;
+        }
 
     }
 
@@ -553,7 +539,7 @@ public class DynamicListManager : MonoBehaviour
         {
 
 
-            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Check if the name is taken
+            if (GameController.databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Check if the name is taken
             {
                 saveFeedbackRect.gameObject.SetActive(true);
                 saveFeedbackRect.color = Color.red;
@@ -613,7 +599,7 @@ public class DynamicListManager : MonoBehaviour
                 }
                 break;
             case DynamicListType.LoadList:
-                PlaySession.saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
+                PlaySession.saveInfo = (SaveGameInfo)listMemberDatas[int.Parse(selectedButton.name)];
                 uiEventHandler.SwitchScene(PlaySession.saveInfo.levelName);
                 break;
             default:
@@ -662,7 +648,7 @@ public class DynamicListManager : MonoBehaviour
     private void OverwriteSelectedSave()
     {
         //Get the SaveGameInfo that corresponds to the clicked button
-        SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
+        SaveGameInfo saveInfo = (SaveGameInfo)listMemberDatas[int.Parse(selectedButton.name)];
 
         if (gameController.Save(saveInfo.saveTitle, saveInfo.fileName, true)) //Try to do an overwriting save
         {
@@ -728,13 +714,13 @@ public class DynamicListManager : MonoBehaviour
         confirmationPanel.SetActive(false);
 
         //Get the SaveGameInfo that corresponds to the clicked button
-        SaveGameInfo saveInfo = saveGameInfos[int.Parse(selectedButton.name)];
+        SaveGameInfo saveInfo = (SaveGameInfo)listMemberDatas[int.Parse(selectedButton.name)];
 
         if (FileManager.DeleteFile(FileManager.saveDirectory, saveInfo.fileName, ".save")) //Try to delete the file
         {
 
             //Delete save record from database
-            databaseManager.DeleteSave(saveInfo.saveTitle);
+            GameController.databaseManager.DeleteSave(saveInfo.saveTitle);
             //Reload the list
             LoadButtons();
             if (saveInfo.saveTitle == PlaySession.saveInfo.saveTitle)
@@ -780,7 +766,7 @@ public class DynamicListManager : MonoBehaviour
         public string[] textContents;
 
         /// <summary>
-        /// Turns the provided into a string array.
+        /// Turns the provided SaveGameInfo into a string array.
         /// </summary>
         /// <param name="saveGameInfo">Source SaveGameInfo</param>
         public ListMemberText(SaveGameInfo saveGameInfo)
@@ -788,6 +774,17 @@ public class DynamicListManager : MonoBehaviour
             TimeSpan time = TimeSpan.FromSeconds(saveGameInfo.elapsedTime);
 
             textContents = new string[] { saveGameInfo.saveTitle, saveGameInfo.levelName, saveGameInfo.difficulty.ToString(), saveGameInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), saveGameInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
+        }
+
+        /// <summary>
+        /// Turns the provided WinInfo into a string array.
+        /// </summary>
+        /// <param name="winInfo">Source WinInfo</param>
+        public ListMemberText(WinInfo winInfo)
+        {
+            TimeSpan time = TimeSpan.FromSeconds(winInfo.elapsedTime);
+
+            textContents = new string[] { winInfo.username, winInfo.levelName, winInfo.difficulty.ToString(), winInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), winInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
         }
 
     }
@@ -821,7 +818,7 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.SaveList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
                     colDatabaseFields = new string[] { "title", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, true, false, false, false };
+                    defaultSortingMode = new bool[] { true, true, false, false, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
@@ -829,7 +826,15 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.LoadList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
                     colDatabaseFields = new string[] { "title", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, true, false, false, false };
+                    defaultSortingMode = new bool[] { true, true, false, false, false, false };
+                    textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
+                    textFields = new Text[6];
+                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
+                    break;
+                case DynamicListType.LeaderboardList:
+                    colHeaderNames = new string[] { "Felhasználó", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Teljesítés ideje" };
+                    colDatabaseFields = new string[] { "userID", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
+                    defaultSortingMode = new bool[] { true, true, false, false, false, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
@@ -854,7 +859,7 @@ public class DynamicListManager : MonoBehaviour
     /// </summary>
     public enum DynamicListType
     {
-        SaveList, LoadList
+        SaveList, LoadList, LeaderboardList
     }
 }
 
@@ -892,4 +897,23 @@ public struct SaveGameInfo
         saveTime = new DateTime();
         elapsedTime = 0f;
     }
+}
+
+/// <summary>
+/// Struct containing basic information about a level completion.
+/// </summary>
+public struct WinInfo
+{
+    /// <summary>Username</summary>
+    public string username;
+    /// <summary>Level name</summary>
+    public string levelName;
+    /// <summary>Difficulty</summary>
+    public int difficulty;
+    /// <summary>Moves made</summary>
+    public int moves;
+    /// <summary>Time taken</summary>
+    public float elapsedTime;
+    /// <summary>When it was completed</summary>
+    public DateTime saveTime;
 }
