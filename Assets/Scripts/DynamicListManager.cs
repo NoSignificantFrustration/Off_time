@@ -64,6 +64,8 @@ public class DynamicListManager : MonoBehaviour
     [SerializeField] private ColorBlock selectedColorBlock;
     /// <summary>Colors that will be assigned to the normal list member button</summary>
     private ColorBlock normalColorBlock;
+    /// <summary>Number of functional buttons (fe.: New save button, Add quiz button) before the buttons that have the data on them</summary>
+    private int extraButtonCount;
     /// <summary>Color of the list's text fields</summary>
     private Color textColor;
     /// <summary>The header's field information</summary>
@@ -185,6 +187,9 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.LeaderboardList:
                 HeaderElementPressed(headerButtons.Count - 1);
                 break;
+            case DynamicListType.QuizList:
+                HeaderElementPressed(0);
+                break;
             default:
                 break;
         }
@@ -201,7 +206,9 @@ public class DynamicListManager : MonoBehaviour
             GameObject.Destroy(child.gameObject);
         }
 
+        //Reset some variables
         listMemberButtons = new List<GameObject>();
+        extraButtonCount = 0;
 
         Button chooseButtonComp = chooseButton.GetComponent<Button>();
         Button deleteButtonComp = deleteButton.GetComponent<Button>();
@@ -230,6 +237,7 @@ public class DynamicListManager : MonoBehaviour
                 textComponent.text = "Új mentés";
                 textComponent.fontSize = (int)listMemberHeight - 10;
                 listMemberButtons.Add(newSaveButton);
+                extraButtonCount++;
 
 
 
@@ -253,6 +261,8 @@ public class DynamicListManager : MonoBehaviour
                 //Get the user's saves from the database
                 listMemberDatas = databaseManager.GetSavedGames(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
+                //Set list member height
+                listMemberHeight = 80;
                 break;
             case DynamicListType.LeaderboardList:
 
@@ -263,9 +273,41 @@ public class DynamicListManager : MonoBehaviour
                 //Get the leaderboard from database
                 listMemberDatas = databaseManager.GetLeaderboard(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
 
+                //Set list member height
+                listMemberHeight = 80;
+                break;
+            case DynamicListType.QuizList:
+
+                //Set up delete button
+                deleteButton.SetActive(true);
+                deleteButtonComp.interactable = false;
+
+                //Set up choose button
+                chooseButton.SetActive(true);
+                chooseButton.GetComponentInChildren<Text>().text = "Módosítás";
+                chooseButtonComp.onClick.RemoveAllListeners();
+                chooseButtonComp.interactable = false;
+                chooseButtonComp.onClick.AddListener(delegate { ChooseButtonClicked(); });
+
+                //Add new quiz button
+                GameObject newQuizButton = CreateListMember();
+                Button newQuizButtonComponent = newQuizButton.GetComponent<Button>();
+                newQuizButtonComponent.onClick.AddListener(delegate { NewSaveSlotPressed(); });
+                Text textComp = newQuizButtonComponent.GetComponentInChildren<Text>();
+                textComp.text = "Új kvíz hozzáadása";
+                textComp.fontSize = 100;
+                listMemberButtons.Add(newQuizButton);
+                extraButtonCount++;
+
+                //Get quizes from database
+                listMemberDatas = databaseManager.GetUserQuizes(headerProperty.colDatabaseFields[selectedHeader], sortingMode);
+
+                //Set list member height
+                listMemberHeight = 180;
                 break;
             default:
                 deleteButton.SetActive(false);
+                chooseButton.SetActive(false);
                 break;
         }
 
@@ -276,7 +318,7 @@ public class DynamicListManager : MonoBehaviour
 
             Button bComponent = button.GetComponent<Button>();
             int temp = i;
-            bComponent.onClick.AddListener(delegate { ListElementPressed(temp); });
+            bComponent.onClick.AddListener(delegate { ListElementPressed(temp + extraButtonCount); });
             button.name = i.ToString();
             //Set up the text fields of the button
             CreateTextFields(button, i);
@@ -296,7 +338,7 @@ public class DynamicListManager : MonoBehaviour
         //Instantiate a new button 
         GameObject button = Instantiate(buttonPrefab, Vector3.zero, Quaternion.identity);
         RectTransform rectTransform = button.GetComponent<RectTransform>();
-        rectTransform.SetParent(content.transform); 
+        rectTransform.SetParent(content.transform);
         //Set up the anchors
         rectTransform.anchorMin = new Vector2(0f, 1f);
         rectTransform.anchorMax = new Vector2(1f, 1f);
@@ -326,7 +368,7 @@ public class DynamicListManager : MonoBehaviour
 
                 //Get the displayable text from the SaveGameInfo specified by the given index
                 listMemberText = new ListMemberText((SaveGameInfo)listMemberDatas[index]);
-               
+
                 break;
             case DynamicListType.LoadList:
 
@@ -340,7 +382,14 @@ public class DynamicListManager : MonoBehaviour
                 listMemberText = new ListMemberText((WinInfo)listMemberDatas[index]);
 
                 break;
+            case DynamicListType.QuizList:
+
+                //Get the displayable text from the SaveGameInfo specified by the given index
+                listMemberText = new ListMemberText((QuizHandler.QuizData)listMemberDatas[index]);
+
+                break;
             default:
+                //This will fail, make sure to cover all list types above
                 listMemberText = new ListMemberText((SaveGameInfo)listMemberDatas[index]);
                 break;
         }
@@ -479,6 +528,39 @@ public class DynamicListManager : MonoBehaviour
                     selectedButton = listMemberButtons[index];
                 }
                 break;
+            case DynamicListType.QuizList:
+                chooseButton.GetComponent<Button>().interactable = true;
+                deleteButton.GetComponent<Button>().interactable = true;
+
+                if (listMemberButtons[index] == selectedButton)
+                {
+                    //Double click detection
+                    if (Time.time - lastClickTime <= 0.5f)
+                    {
+                        ChooseButtonClicked();
+                        //Debug.Log("DoubleClick");
+                    }
+
+                }
+                else
+                {
+
+
+                    Button clickedButtonComp = listMemberButtons[index].GetComponent<Button>();
+
+                    //Set the previous button's colors back to normal
+                    if (selectedButton != null)
+                    {
+                        Button selectedButtonComp = selectedButton.GetComponent<Button>();
+                        selectedButtonComp.colors = normalColorBlock;
+                    }
+
+                    //Set the clicked buttons's color to the selection color
+                    clickedButtonComp.colors = selectedColorBlock;
+
+                    selectedButton = listMemberButtons[index];
+                }
+                break;
             default:
                 break;
         }
@@ -539,7 +621,7 @@ public class DynamicListManager : MonoBehaviour
         {
 
 
-            if (GameController.databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Check if the name is taken
+            if (databaseManager.CheckIfSaveNameTaken(newSaveInput.text)) //Check if the name is taken
             {
                 saveFeedbackRect.gameObject.SetActive(true);
                 saveFeedbackRect.color = Color.red;
@@ -701,6 +783,7 @@ public class DynamicListManager : MonoBehaviour
                     confirmationPanel.SetActive(true);
                 }
                 break;
+            
             default:
                 break;
         }
@@ -720,7 +803,7 @@ public class DynamicListManager : MonoBehaviour
         {
 
             //Delete save record from database
-            GameController.databaseManager.DeleteSave(saveInfo.saveTitle);
+            databaseManager.DeleteSave(saveInfo.saveTitle);
             //Reload the list
             LoadButtons();
             if (saveInfo.saveTitle == PlaySession.saveInfo.saveTitle)
@@ -760,6 +843,8 @@ public class DynamicListManager : MonoBehaviour
     /// </summary>
     public struct ListMemberText
     {
+        
+
         /// <summary>
         /// The resulting string array.
         /// </summary>
@@ -771,9 +856,11 @@ public class DynamicListManager : MonoBehaviour
         /// <param name="saveGameInfo">Source SaveGameInfo</param>
         public ListMemberText(SaveGameInfo saveGameInfo)
         {
+            string[] difficultyNames = new string[] { "Könnyû", "Közepes", "Nehéz" };
+
             TimeSpan time = TimeSpan.FromSeconds(saveGameInfo.elapsedTime);
 
-            textContents = new string[] { saveGameInfo.saveTitle, saveGameInfo.levelName, saveGameInfo.difficulty.ToString(), saveGameInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), saveGameInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
+            textContents = new string[] { saveGameInfo.saveTitle, saveGameInfo.levelName, difficultyNames[saveGameInfo.difficulty], saveGameInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), saveGameInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
         }
 
         /// <summary>
@@ -782,9 +869,22 @@ public class DynamicListManager : MonoBehaviour
         /// <param name="winInfo">Source WinInfo</param>
         public ListMemberText(WinInfo winInfo)
         {
+            string[] difficultyNames = new string[] { "Könnyû", "Közepes", "Nehéz" };
+
             TimeSpan time = TimeSpan.FromSeconds(winInfo.elapsedTime);
 
-            textContents = new string[] { winInfo.username, winInfo.levelName, winInfo.difficulty.ToString(), winInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), winInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
+            textContents = new string[] { winInfo.username, winInfo.levelName, difficultyNames[winInfo.difficulty], winInfo.moves.ToString(), time.ToString("hh':'mm':'ss"), winInfo.saveTime.ToString("yyyy-MM-dd HH:mm:ss") };
+        }
+
+        /// <summary>
+        /// Turns the provided QuizHandler.QuizData into a string array.
+        /// </summary>
+        /// <param name="winInfo">Source QuizHandler.QuizData</param>
+        public ListMemberText(QuizHandler.QuizData quizData)
+        {
+            string[] difficultyNames = new string[] { "Könnyû", "Közepes", "Nehéz" };
+
+            textContents = new string[] { difficultyNames[quizData.difficulty], quizData.question, quizData.good_answer, quizData.bad_answers[0], quizData.bad_answers[1], quizData.bad_answers[2] };
         }
 
     }
@@ -839,6 +939,14 @@ public class DynamicListManager : MonoBehaviour
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
                     break;
+                case DynamicListType.QuizList:
+                    colHeaderNames = new string[] { "Nehézség", "Kérdés", "Jó válasz", "Rossz válasz 1", "Rossz válasz 2", "Rossz válasz 3" };
+                    colDatabaseFields = new string[] { "difficulty", "question", "good_answer", "bad_answer1", "bad_answer2", "bad_answer3" };
+                    defaultSortingMode = new bool[] { true, true, true, true, true, true };
+                    textRectAnchors = new float[] { 0f, 0.0842f, 0.485f, 0.6125f, 0.74f, 0.871f, 1f };
+                    textFields = new Text[6];
+                    textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft };
+                    break;
                 default:
                     colHeaderNames = new string[] { };
                     colDatabaseFields = new string[] { };
@@ -859,7 +967,7 @@ public class DynamicListManager : MonoBehaviour
     /// </summary>
     public enum DynamicListType
     {
-        SaveList, LoadList, LeaderboardList
+        SaveList, LoadList, LeaderboardList, QuizList
     }
 }
 

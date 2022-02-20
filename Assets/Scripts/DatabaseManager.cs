@@ -186,6 +186,8 @@ public class DatabaseManager : MonoBehaviour
 
                     reader.Read();
 
+                    dat.id = int.Parse(reader["id"].ToString());
+                    dat.difficulty = int.Parse(reader["difficulty"].ToString());
                     dat.question = reader["question"].ToString();
                     dat.good_answer = reader["good_answer"].ToString();
                     dat.bad_answers = new string[3];
@@ -303,7 +305,9 @@ public class DatabaseManager : MonoBehaviour
     /// <summary>
     /// Gets the current user's saved games using their ID.
     /// </summary>
-    /// <returns>A list of SaveGameInfos</returns>
+    /// <param name="orderByCol">Column the records should be ordered by</param>
+    /// <param name="sortingMode">Sorting mode (ASC/DESC)</param>
+    /// <returns>A list of SaveGameInfos as generic objects.</returns>
     /// <seealso cref="SaveGameInfo"/>
     public List<object> GetSavedGames(string orderByCol, bool sortingMode)
     {
@@ -462,6 +466,12 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Gets the leaderboard.
+    /// </summary>
+    /// <param name="orderByCol">Column the records should be ordered by</param>
+    /// <param name="sortingMode">Sorting mode (ASC/DESC)</param>
+    /// <returns>A list of WinDatas as gneric objects.</returns>
     public List<object> GetLeaderboard(string orderByCol, bool sortingMode)
     {
         List<object> winInfos = new List<object>();
@@ -487,6 +497,45 @@ public class DatabaseManager : MonoBehaviour
                         winInfo.saveTime = DateTime.ParseExact(reader["savetime"].ToString(), "yyyy-MM-dd HH:mm:ss", CultureInfo.InvariantCulture);
                         winInfo.elapsedTime = float.Parse(reader["elapsedTime"].ToString()) / 100f;
                         winInfos.Add(winInfo);
+                        //"yyyy-MM-dd HH:mm:ss"
+                    }
+                    reader.Close();
+                }
+
+            }
+            connection.Close();
+        }
+
+        return winInfos;
+    }
+
+    public List<object> GetUserQuizes(string orderByCol, bool sortingMode)
+    {
+        List<object> winInfos = new List<object>();
+
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                string mode = sortingMode ? "ASC" : "DESC";
+                command.CommandText = $"SELECT * FROM questions ORDER BY {orderByCol} {mode} ";
+                command.ExecuteNonQuery();
+
+                using (IDataReader reader = command.ExecuteReader())
+                {
+                    while (reader.Read())
+                    {
+                        QuizHandler.QuizData quizData = new QuizHandler.QuizData();
+                        quizData.id = int.Parse(reader["id"].ToString());
+                        quizData.difficulty = int.Parse(reader["difficulty"].ToString());
+                        quizData.question = reader["question"].ToString();
+                        quizData.good_answer = reader["good_answer"].ToString();
+                        quizData.bad_answers = new string[3];
+                        quizData.bad_answers[0] = reader["bad_answer1"].ToString();
+                        quizData.bad_answers[1] = reader["bad_answer2"].ToString();
+                        quizData.bad_answers[2] = reader["bad_answer3"].ToString();
+                        winInfos.Add(quizData);
                         //"yyyy-MM-dd HH:mm:ss"
                     }
                     reader.Close();

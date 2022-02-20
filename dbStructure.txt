@@ -4,7 +4,7 @@ questions:
 	CREATE TABLE "questions" (
 	"id"	INTEGER,
 	"difficulty"	int(1) NOT NULL,
-	"question"	varchar(255) NOT NULL,
+	"question"	varchar(175) NOT NULL,
 	"good_answer"	varchar(100) NOT NULL,
 	"bad_answer1"	varchar(100) NOT NULL,
 	"bad_answer2"	varchar(100) NOT NULL,

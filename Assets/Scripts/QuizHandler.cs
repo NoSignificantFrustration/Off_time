@@ -81,6 +81,8 @@ public class QuizHandler : MonoBehaviour
 
     public struct QuizData
     {
+        public int id;
+        public int difficulty;
         public string question;
         public string good_answer;
         public string[] bad_answers;
