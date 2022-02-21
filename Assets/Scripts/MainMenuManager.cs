@@ -67,7 +67,7 @@ public class MainMenuManager : MonoBehaviour
     {
         bool ready = true;
 
-        Regex rgx = new Regex("[^A-Za-z0-9]");
+        Regex rgx = new Regex(UIEventHandler.loginRegex);
 
         //Loop through the register text fields
         for (int i = 0; i < 3; i++)
@@ -164,7 +164,7 @@ public class MainMenuManager : MonoBehaviour
 
         bool ready = true;
 
-        Regex rgx = new Regex("[^A-Za-z0-9]");
+        Regex rgx = new Regex(UIEventHandler.loginRegex);
 
         //Loop through the login text fields
         for (int i = 0; i < 2; i++)

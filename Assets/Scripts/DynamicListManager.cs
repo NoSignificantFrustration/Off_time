@@ -478,7 +478,7 @@ public class DynamicListManager : MonoBehaviour
                 }
                 else
                 {
-
+                    
 
                     Button clickedButtonComp = listMemberButtons[index].GetComponent<Button>();
 
@@ -683,6 +683,10 @@ public class DynamicListManager : MonoBehaviour
             case DynamicListType.LoadList:
                 PlaySession.saveInfo = (SaveGameInfo)listMemberDatas[int.Parse(selectedButton.name)];
                 uiEventHandler.SwitchScene(PlaySession.saveInfo.levelName);
+                break;
+            case DynamicListType.QuizList:
+                uiEventHandler.quizRecordAdder.Refresh((QuizHandler.QuizData)listMemberDatas[int.Parse(selectedButton.name)]);
+                uiEventHandler.OpenMenu(uiEventHandler.quizRecordAdder.gameObject);
                 break;
             default:
                 break;

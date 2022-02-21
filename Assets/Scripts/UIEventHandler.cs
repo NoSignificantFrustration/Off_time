@@ -14,10 +14,13 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private GameObject quizMenu;
     [SerializeField] private QuizHandler quizHandler;
     [SerializeField] private GameObject saveLoadMenu;
+    [SerializeField] public RecordAdder quizRecordAdder { get; private set; }
     private PlayerInputAsset controls;
     private Stack<GameObject> uiStack;
     private GameObject currentUI;
     private DroneController drone;
+    public readonly static string loginRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9_]";
+    public readonly static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.]";
 
 
     private void Awake()
