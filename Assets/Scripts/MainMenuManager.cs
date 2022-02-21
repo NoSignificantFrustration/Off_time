@@ -41,11 +41,11 @@ public class MainMenuManager : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        eventHandler.OpenMenu(loginMenu);
+        eventHandler.OpenMenuAsRoot(loginMenu);
         if (PlaySession.userID > 0) //Check if anyone is logged in
         {
             usernameText.text = PlaySession.username; //Display their name
-            eventHandler.OpenMenu(mainMenu);
+            eventHandler.OpenMenuAsRoot(mainMenu);
         }
 
         //Get the text field references
@@ -210,7 +210,7 @@ public class MainMenuManager : MonoBehaviour
                 {
                     loginFields[i].text = "";
                 }
-                eventHandler.OpenMenu(mainMenu);
+                eventHandler.OpenMenuAsRoot(mainMenu);
             }
             else
             {
@@ -231,7 +231,7 @@ public class MainMenuManager : MonoBehaviour
         PlaySession.userID = new int();
         PlaySession.username = null;
         PlaySession.saveInfo.fileName = null;
-        eventHandler.CloseMenu();
+        eventHandler.CloseRoot();
     }
 
 }

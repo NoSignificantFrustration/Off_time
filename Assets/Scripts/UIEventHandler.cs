@@ -14,9 +14,10 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private GameObject quizMenu;
     [SerializeField] private QuizHandler quizHandler;
     [SerializeField] private GameObject saveLoadMenu;
-    [SerializeField] public RecordAdder quizRecordAdder { get; private set; }
+    [SerializeField] private RecordAdder quizRecordAdder;
     private PlayerInputAsset controls;
     private Stack<GameObject> uiStack;
+    public int minStackDepth = 0;
     private GameObject currentUI;
     private DroneController drone;
     public readonly static string loginRegex = "[^A-Z¡…Õ”÷’⁄‹€a-z·ÈÌÛˆı˙¸˚0-9_]";
@@ -28,22 +29,24 @@ public class UIEventHandler : MonoBehaviour
         uiStack = new Stack<GameObject>();
         currentUI = null;
         controls = new PlayerInputAsset();
-        if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
-        {
-            controls.UI.Pause.performed += Escape;
-        }
+
+        controls.UI.Pause.performed += Escape;
         isPaused = false;
     }
 
     public void Escape(InputAction.CallbackContext obj)
     {
-
+        //Debug.Log(minStackDepth + " " + uiStack.Count);
         CloseMenu();
         
   
     }
     public void CloseMenu()
     {
+        if (uiStack.Count + 1 <= minStackDepth)
+        {
+            return;
+        }
         if (currentUI == null || currentUI == pauseMenu)
         {
             Pause();
@@ -143,6 +146,26 @@ public class UIEventHandler : MonoBehaviour
         currentUI.SetActive(true);
     }
 
+    public void OpenMenuAsRoot(GameObject menu)
+    {
+        if (currentUI != null)
+        {
+
+            currentUI.SetActive(false);
+            uiStack.Push(currentUI);
+        }
+
+        minStackDepth++;
+        currentUI = menu;
+        currentUI.SetActive(true);
+    }
+
+    public void CloseRoot()
+    {
+        minStackDepth--;
+        CloseMenu();  
+    }
+
     public void StartQuiz(DroneController drone)
     {
         
@@ -190,5 +213,9 @@ public class UIEventHandler : MonoBehaviour
         controls.Disable();
     }
 
+    public RecordAdder GetRecordAdder()
+    {
+        return quizRecordAdder;
+    }
    
 }

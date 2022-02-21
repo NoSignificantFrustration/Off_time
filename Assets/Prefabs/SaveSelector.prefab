@@ -87,7 +87,6 @@ MonoBehaviour:
     m_DisabledColor: {r: 0, g: 0.2392157, b: 1, a: 0.39607844}
     m_ColorMultiplier: 1
     m_FadeDuration: 0.1
-  selectedHeader: {fileID: 0}
 --- !u!222 &772252767890593164
 CanvasRenderer:
   m_ObjectHideFlags: 0

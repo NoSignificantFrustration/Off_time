@@ -292,7 +292,10 @@ public class DynamicListManager : MonoBehaviour
                 //Add new quiz button
                 GameObject newQuizButton = CreateListMember();
                 Button newQuizButtonComponent = newQuizButton.GetComponent<Button>();
-                newQuizButtonComponent.onClick.AddListener(delegate { NewSaveSlotPressed(); });
+                newQuizButtonComponent.onClick.AddListener(delegate {
+                    uiEventHandler.GetRecordAdder().Refresh();
+                    uiEventHandler.OpenMenu(uiEventHandler.GetRecordAdder().gameObject);
+                });
                 Text textComp = newQuizButtonComponent.GetComponentInChildren<Text>();
                 textComp.text = "Új kvíz hozzáadása";
                 textComp.fontSize = 100;
@@ -685,8 +688,8 @@ public class DynamicListManager : MonoBehaviour
                 uiEventHandler.SwitchScene(PlaySession.saveInfo.levelName);
                 break;
             case DynamicListType.QuizList:
-                uiEventHandler.quizRecordAdder.Refresh((QuizHandler.QuizData)listMemberDatas[int.Parse(selectedButton.name)]);
-                uiEventHandler.OpenMenu(uiEventHandler.quizRecordAdder.gameObject);
+                uiEventHandler.GetRecordAdder().Refresh((QuizHandler.QuizData)listMemberDatas[int.Parse(selectedButton.name)]);
+                uiEventHandler.OpenMenu(uiEventHandler.GetRecordAdder().gameObject);
                 break;
             default:
                 break;
