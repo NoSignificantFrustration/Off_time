@@ -6,9 +6,13 @@ public class RecordAdder : MonoBehaviour
 {
 
     [SerializeField] private DatabaseManager databaseManager;
+    [SerializeField] private UIEventHandler uIEventHandler;
     [SerializeField] private Dropdown difficultyInput;
     [SerializeField] private InputField[] quesionInputs = new InputField[5];
     [SerializeField] private Button confirmButton;
+    [SerializeField] private GameObject feedbackPanel;
+    [SerializeField] private Text[] feedbackTexts = new Text[2];
+    [SerializeField] private Button feedbackPanelButton;
     private QuizHandler.QuizData quizData;
 
     public void Refresh(QuizHandler.QuizData data)
@@ -45,7 +49,7 @@ public class RecordAdder : MonoBehaviour
 
     public void UpdateQuiz()
     {
-
+        TryMakeQuizData(out QuizHandler.QuizData data);
     }
 
     private bool TryMakeQuizData(out QuizHandler.QuizData result)
@@ -62,12 +66,35 @@ public class RecordAdder : MonoBehaviour
 
             if (quesionInputs[i].text.Equals(""))
             {
+                feedbackTexts[0].text = "Hiba";
+                feedbackTexts[1].text = "Az összes mezõt ki kell tölteni!";
+                feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+                feedbackPanelButton.onClick.RemoveAllListeners();
+                feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+                feedbackPanel.SetActive(true);
+
                 return false;
             }
             else if (rgx.IsMatch(quesionInputs[i].text))
             {
+                feedbackTexts[0].text = "Hiba";
+                feedbackTexts[1].text = "Egy vagy több mezõ nem megengedett karaktert tartalmaz.\nMegengedett karakterek: A-Z 0-9 _!?.()-";
+                feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+                feedbackPanelButton.onClick.RemoveAllListeners();
+                feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+                feedbackPanel.SetActive(true);
+
                 return false;
             }
+        }
+
+        result.difficulty = difficultyInput.value;
+        result.question = quesionInputs[0].text;
+        result.good_answer = quesionInputs[1].text;
+        result.bad_answers = new string[3];
+        for (int i = 0; i < 3; i++)
+        {
+            result.bad_answers[i] = quesionInputs[i + 2].text;
         }
 
         return true;
@@ -75,15 +102,8 @@ public class RecordAdder : MonoBehaviour
 
     public void AddQuiz()
     {
-        QuizHandler.QuizData data = new QuizHandler.QuizData();
 
-        data.difficulty = difficultyInput.value;
-        data.question = quesionInputs[0].text;
-        data.good_answer = quesionInputs[1].text;
-        for (int i = 0; i < 3; i++)
-        {
-            data.bad_answers[i] = quesionInputs[i + 2].text;
-        }
+        TryMakeQuizData(out QuizHandler.QuizData data);
 
 
 
@@ -96,5 +116,8 @@ public class RecordAdder : MonoBehaviour
 
     }
 
-
+    public void Close()
+    {
+        uIEventHandler.CloseMenu();
+    }
 }

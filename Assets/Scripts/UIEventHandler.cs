@@ -21,7 +21,7 @@ public class UIEventHandler : MonoBehaviour
     private GameObject currentUI;
     private DroneController drone;
     public readonly static string loginRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9_]";
-    public readonly static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.]";
+    public readonly static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.()-]";
 
 
     private void Awake()
