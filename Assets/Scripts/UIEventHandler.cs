@@ -217,5 +217,10 @@ public class UIEventHandler : MonoBehaviour
     {
         return quizRecordAdder;
     }
+
+    public GameObject GetSaveLoadMenu()
+    {
+        return saveLoadMenu;
+    }
    
 }

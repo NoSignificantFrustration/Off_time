@@ -548,4 +548,47 @@ public class DatabaseManager : MonoBehaviour
         return winInfos;
     }
 
+    public void AddQuiz(QuizHandler.QuizData data)
+    {
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"INSERT INTO questions (difficulty, question, good_answer, bad_answer1, bad_answer2, bad_answer3, user_added) VALUES" +
+                    $"('{data.difficulty}', '{data.question}', '{data.good_answer}', '{data.bad_answers[0]}', '{data.bad_answers[1]}', '{data.bad_answers[2]}', '1')";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
+
+    public void UpdateQuiz(QuizHandler.QuizData data)
+    {
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"UPDATE questions SET difficulty = '{data.difficulty}', question = '{data.question}', good_answer = '{data.good_answer}', bad_answer1 = '{data.bad_answers[0]}', bad_answer2 = '{data.bad_answers[1]}', bad_answer3 = '{data.bad_answers[2]}' WHERE id = {data.id}";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
+
+    public void DeleteQuiz(int id)
+    {
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"DELETE FROM questions WHERE id = '{id}'";
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
+    }
+
 }

@@ -198,7 +198,7 @@ public class DynamicListManager : MonoBehaviour
     /// <summary>
     /// Sets up the list members.
     /// </summary>
-    private void LoadButtons()
+    public void LoadButtons()
     {
         //Destroy all existing list members
         foreach (Transform child in content.transform)
@@ -790,7 +790,14 @@ public class DynamicListManager : MonoBehaviour
                     confirmationPanel.SetActive(true);
                 }
                 break;
-            
+            case DynamicListType.QuizList:
+                confirmationTexts[0].text = "Törlés";
+                confirmationTexts[1].text = "Biztosan törlöd a kiválasztott kvízt?\n(Ez a mûvelet nem fordítható vissza)";
+                confirmPanelButton.GetComponentInChildren<Text>().text = "Törlés";
+                confirmPanelButton.onClick.RemoveAllListeners();
+                confirmPanelButton.onClick.AddListener(delegate { DeleteSelectedQuiz(); });
+                confirmationPanel.SetActive(true);
+                break;
             default:
                 break;
         }
@@ -835,6 +842,27 @@ public class DynamicListManager : MonoBehaviour
             feedbackPanel.SetActive(true);
         }
 
+    }
+
+    private void DeleteSelectedQuiz()
+    {
+        confirmationPanel.SetActive(false);
+
+        //Get the QuizHandler.QuizData that corresponds to the clicked button
+        QuizHandler.QuizData quizData = (QuizHandler.QuizData)listMemberDatas[int.Parse(selectedButton.name)];
+
+        //Delete quiz record from database
+        databaseManager.DeleteQuiz(quizData.id);
+
+        //Reload the list
+        LoadButtons();
+
+        feedbackTexts[0].text = "Törlés";
+        feedbackTexts[1].text = "A kvíz sikeresen törölve";
+        feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+        feedbackPanelButton.onClick.RemoveAllListeners();
+        feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+        feedbackPanel.SetActive(true);
     }
 
     /// <summary>

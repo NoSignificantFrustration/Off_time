@@ -10,6 +10,7 @@ public class RecordAdder : MonoBehaviour
     [SerializeField] private Dropdown difficultyInput;
     [SerializeField] private InputField[] quesionInputs = new InputField[5];
     [SerializeField] private Button confirmButton;
+    [SerializeField] private Button backButton;
     [SerializeField] private GameObject feedbackPanel;
     [SerializeField] private Text[] feedbackTexts = new Text[2];
     [SerializeField] private Button feedbackPanelButton;
@@ -27,6 +28,12 @@ public class RecordAdder : MonoBehaviour
             quesionInputs[i + 2].text = data.bad_answers[i];
         }
 
+        backButton.onClick.RemoveAllListeners();
+        backButton.onClick.AddListener(delegate {
+            uIEventHandler.GetSaveLoadMenu().GetComponentInChildren<DynamicListManager>().LoadButtons();
+            Close(); 
+        });
+
         confirmButton.onClick.RemoveAllListeners();
         confirmButton.onClick.AddListener(delegate { UpdateQuiz(); });
         confirmButton.GetComponentInChildren<Text>().text = "Mentés";
@@ -39,18 +46,19 @@ public class RecordAdder : MonoBehaviour
             item.text = "";
 
         }
-        
-        
+
+        backButton.onClick.RemoveAllListeners();
+        backButton.onClick.AddListener(delegate {
+            uIEventHandler.GetSaveLoadMenu().GetComponentInChildren<DynamicListManager>().LoadButtons();
+            Close();
+        });
 
         confirmButton.onClick.RemoveAllListeners();
         confirmButton.onClick.AddListener(delegate { AddQuiz(); });
         confirmButton.GetComponentInChildren<Text>().text = "Hozzáadás";
     }
 
-    public void UpdateQuiz()
-    {
-        TryMakeQuizData(out QuizHandler.QuizData data);
-    }
+    
 
     private bool TryMakeQuizData(out QuizHandler.QuizData result)
     {
@@ -58,7 +66,6 @@ public class RecordAdder : MonoBehaviour
         Regex rgx = new Regex(UIEventHandler.textRegex);
         result = new QuizHandler.QuizData();
         result.id = 0;
-        result.difficulty = difficultyInput.value;
 
         for (int i = 0; i < quesionInputs.Length; i++)
         {
@@ -100,21 +107,51 @@ public class RecordAdder : MonoBehaviour
         return true;
     }
 
-    public void AddQuiz()
+    public void UpdateQuiz()
     {
 
-        TryMakeQuizData(out QuizHandler.QuizData data);
-
-
-
-        foreach (InputField field in quesionInputs)
+        if (TryMakeQuizData(out QuizHandler.QuizData data))
         {
-            field.text = "";
+            data.id = quizData.id;
+
+            feedbackTexts[0].text = "Sikeres mentés";
+            feedbackTexts[1].text = "Kvíz sikeresen módosítva.";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { 
+                feedbackPanel.SetActive(false);
+                uIEventHandler.GetSaveLoadMenu().GetComponentInChildren<DynamicListManager>().LoadButtons();
+                Close();
+            });
+            feedbackPanel.SetActive(true);
+
+            databaseManager.UpdateQuiz(data);
+        }
+    }
+
+    public void AddQuiz()
+    {
+        if (TryMakeQuizData(out QuizHandler.QuizData data))
+        {
+            databaseManager.AddQuiz(data);
+
+            feedbackTexts[0].text = "Sikeres mentés";
+            feedbackTexts[1].text = "Kvíz sikeresen hozzáadva.";
+            feedbackPanelButton.GetComponentInChildren<Text>().text = "Ok";
+            feedbackPanelButton.onClick.RemoveAllListeners();
+            feedbackPanelButton.onClick.AddListener(delegate { feedbackPanel.SetActive(false); });
+            feedbackPanel.SetActive(true);
+
+            foreach (InputField field in quesionInputs)
+            {
+                field.text = "";
+
+            }
 
         }
-
-
+        
     }
+
 
     public void Close()
     {
