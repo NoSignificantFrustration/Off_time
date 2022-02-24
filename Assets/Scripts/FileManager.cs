@@ -45,9 +45,12 @@ public static class FileManager
                 int i = 0;
                 do
                 {
+                    
                     actualFileName = preferredFileName + $"({i})";
                     fullPath = Path.Combine(folderPath, actualFileName + extension);
+                    i++;
                 } while (File.Exists(fullPath));
+                Debug.Log(actualFileName);
             }
         }
         else

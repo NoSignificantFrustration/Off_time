@@ -10,6 +10,8 @@ public class GameController : MonoBehaviour
 {
     /// <summary>Database manager</summary>
     [SerializeField] public DatabaseManager databaseManager;
+    /// <summary>Level number</summary>
+    [SerializeField] public int levelNumber;
     /// <summary>References to all the nodes</summary>
     private static GameObject[] nodes;
     /// <summary>References to all the blockers</summary>

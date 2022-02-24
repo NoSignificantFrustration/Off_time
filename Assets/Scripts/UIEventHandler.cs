@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -19,7 +20,8 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private GameObject confirmPanel;
     [SerializeField] private Text[] confirmPanelTexts;
     [SerializeField] private Button[] confirmPanelButtons;
-    private PlayerInputAsset controls;
+    public PlayerInputAsset controls { get; private set; }
+    public UnityEvent escapePressedEvent { get; private set; }
     private Stack<GameObject> uiStack;
     public int minStackDepth = 0;
     private GameObject currentUI;
@@ -35,6 +37,7 @@ public class UIEventHandler : MonoBehaviour
         controls = new PlayerInputAsset();
 
         controls.UI.Pause.performed += Escape;
+        escapePressedEvent = new UnityEvent();
         isPaused = false;
     }
 
@@ -42,11 +45,14 @@ public class UIEventHandler : MonoBehaviour
     {
         //Debug.Log(minStackDepth + " " + uiStack.Count);
         CloseMenu();
-        
+        escapePressedEvent.Invoke();
   
     }
     public void CloseMenu()
     {
+
+        confirmPanel.SetActive(false);
+
         if (uiStack.Count + 1 <= minStackDepth)
         {
             return;

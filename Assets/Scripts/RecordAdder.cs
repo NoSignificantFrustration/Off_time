@@ -1,5 +1,7 @@
+using System;
 using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 public class RecordAdder : MonoBehaviour
@@ -18,6 +20,8 @@ public class RecordAdder : MonoBehaviour
 
     public void Refresh(QuizHandler.QuizData data)
     {
+        feedbackPanel.SetActive(false);
+
         quizData = data;
 
         difficultyInput.value = data.difficulty;
@@ -41,6 +45,8 @@ public class RecordAdder : MonoBehaviour
 
     public void Refresh()
     {
+        feedbackPanel.SetActive(false);
+
         foreach (InputField item in quesionInputs)
         {
             item.text = "";
@@ -129,6 +135,8 @@ public class RecordAdder : MonoBehaviour
         }
     }
 
+    
+
     public void AddQuiz()
     {
         if (TryMakeQuizData(out QuizHandler.QuizData data))
@@ -152,6 +160,8 @@ public class RecordAdder : MonoBehaviour
         
     }
 
+
+    
 
     public void Close()
     {

@@ -202,13 +202,13 @@ public class MainMenuManager : MonoBehaviour
         if (ready)
         {
             loginFeedbackRects[2].gameObject.SetActive(false);
-            if (databaseManager.Login(loginFields[0].text, passHash.ToString(), out int userID, out string uname)) //Check if login credentials are correct
+            if (databaseManager.Login(loginFields[0].text, passHash.ToString(), out int userID, out string uname, out int currentLevel)) //Check if login credentials are correct
             {
                 //Save the userID and name
                 PlaySession.userID = userID;
                 PlaySession.username = uname;
 
-                PlaySession.currentLevel = 2;
+                PlaySession.currentLevel = currentLevel;
 
                 //Display logged in message and clear login fields
                 usernameText.text = "Bejelentkezve " + PlaySession.username + " néven.";

@@ -127,6 +127,9 @@ public class DynamicListManager : MonoBehaviour
         this.listType = listType;
         SetupHeader();
         LoadButtons();
+        confirmationPanel.SetActive(false);
+        feedbackPanel.SetActive(false);
+        newSavePanel.SetActive(false);
 
     }
 

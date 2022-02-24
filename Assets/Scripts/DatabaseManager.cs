@@ -85,7 +85,7 @@ public class DatabaseManager : MonoBehaviour
                             "savetime DATETIME NOT NULL," +
                             "FOREIGN KEY (userID) REFERENCES users(id))";
                         command.ExecuteNonQuery();
-                        command.CommandText = "CREATE TABLE wins(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
+                        command.CommandText = "CREATE TABLE IF NOT EXISTS wins(id INTEGER PRIMARY KEY AUTOINCREMENT, " +
                             "userID INTEGER NOT NULL, " +
                             "difficulty INTEGER(1) NOT NULL, " +
                             "moves INTEGER NOT NULL, " +
@@ -261,8 +261,9 @@ public class DatabaseManager : MonoBehaviour
     /// <param name="password">Password</param>
     /// <param name="userID">UserID</param>
     /// <param name="uname">Username</param>
+    /// <param name="currentLevel">Current level</param>
     /// <returns>True if the login values check out, false if they don't.</returns>
-    public bool Login(string username, string password, out int userID, out string uname)
+    public bool Login(string username, string password, out int userID, out string uname, out int currentLevel)
     {
 
         username = Regex.Escape(username); //Replace(username, @"[\r\n\x00\x1a\\'""]", @"\$0");
@@ -274,7 +275,7 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = "SELECT id, username, COUNT(*) AS count FROM users WHERE username = '" + username + "' AND passwd = '" + password + "'";
+                command.CommandText = "SELECT id, username, currentLevel, COUNT(*) AS count FROM users WHERE username = '" + username + "' AND passwd = '" + password + "'";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())
@@ -286,12 +287,14 @@ public class DatabaseManager : MonoBehaviour
                         success = true;
                         userID = Int32.Parse(reader["id"].ToString());
                         uname = reader["username"].ToString();
+                        currentLevel = Int32.Parse(reader["currentLevel"].ToString());
                     }
                     else
                     {
                         success = false;
                         userID = new int();
                         uname = null;
+                        currentLevel = new int();
                     }
                     reader.Close();
                 }
@@ -300,6 +303,20 @@ public class DatabaseManager : MonoBehaviour
             connection.Close();
         }
         return success;
+    }
+
+    public void UpdateUserCurrentLevel()
+    {
+        using (SqliteConnection connection = new SqliteConnection(connectionPath))
+        {
+            connection.Open();
+            using (SqliteCommand command = connection.CreateCommand())
+            {
+                command.CommandText = $"UPDATE users SET currentLevel = {PlaySession.currentLevel} WHERE id = {PlaySession.userID}"; 
+                command.ExecuteNonQuery();
+            }
+            connection.Close();
+        }
     }
 
     /// <summary>

@@ -17,7 +17,8 @@ users:
 	CREATE TABLE users (
 	id INTEGER PRIMARY KEY AUTOINCREMENT,
 	username varchar(100) NOT NULL,
-	passwd varchar(255) NOT NULL)
+	passwd varchar(255) NOT NULL,
+	currentLevel int(2) NOT NULL DEFAULT 1)
 	
 saves:
 	CREATE TABLE saves (id INTEGER PRIMARY KEY AUTOINCREMENT,
