@@ -33,6 +33,10 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private InputField[] loginFields = new InputField[2];
     /// <summary>Feedback texts under the login input fields</summary>
     private Text[] loginFeedbackTexts = new Text[3];
+    /// <summary>Level selection menu</summary>
+    [SerializeField] private GameObject levelSelectMenu;
+    /// <summary>Level selection buttons</summary>
+    [SerializeField] private Button[] levelSelectButtons;
 
 
     /// <summary>
@@ -204,6 +208,8 @@ public class MainMenuManager : MonoBehaviour
                 PlaySession.userID = userID;
                 PlaySession.username = uname;
 
+                PlaySession.currentLevel = 2;
+
                 //Display logged in message and clear login fields
                 usernameText.text = "Bejelentkezve " + PlaySession.username + " néven.";
                 for (int i = 0; i < loginFields.Length; i++)
@@ -211,6 +217,8 @@ public class MainMenuManager : MonoBehaviour
                     loginFields[i].text = "";
                 }
                 eventHandler.OpenMenuAsRoot(mainMenu);
+
+                
             }
             else
             {
@@ -232,6 +240,22 @@ public class MainMenuManager : MonoBehaviour
         PlaySession.username = null;
         PlaySession.saveInfo.fileName = null;
         eventHandler.CloseRoot();
+    }
+
+    public void OpenLevelSelect()
+    {
+        for (int i = 0; i < levelSelectButtons.Length; i++)
+        {
+            if (i + 1 <= PlaySession.currentLevel)
+            {
+                levelSelectButtons[i].interactable = true;
+            }
+            else
+            {
+                levelSelectButtons[i].interactable = false;
+            }
+        }
+        eventHandler.OpenMenu(levelSelectMenu);
     }
 
 }
