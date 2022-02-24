@@ -844,6 +844,9 @@ public class DynamicListManager : MonoBehaviour
 
     }
 
+    /// <summary>
+    /// Deletes the selected quiz.
+    /// </summary>
     private void DeleteSelectedQuiz()
     {
         confirmationPanel.SetActive(false);

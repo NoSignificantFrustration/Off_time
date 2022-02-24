@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class UIEventHandler : MonoBehaviour
 {
@@ -15,6 +16,9 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private QuizHandler quizHandler;
     [SerializeField] private GameObject saveLoadMenu;
     [SerializeField] private RecordAdder quizRecordAdder;
+    [SerializeField] private GameObject confirmPanel;
+    [SerializeField] private Text[] confirmPanelTexts;
+    [SerializeField] private Button[] confirmPanelButtons;
     private PlayerInputAsset controls;
     private Stack<GameObject> uiStack;
     public int minStackDepth = 0;
@@ -112,16 +116,59 @@ public class UIEventHandler : MonoBehaviour
         SceneManager.LoadScene(scene);
     }
 
-    public void Quit()
+    public void QuitButtonPressed()
     {
-        Application.Quit();
+
+        confirmPanelTexts[0].text = "Kilépés";
+        confirmPanelTexts[1].text = "Biztosan kilépsz a játékból?";
+        if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
+        {
+            confirmPanelTexts[1].text += "\nAz összes mentetlen haladás el fog veszni.";
+        }
+
+        confirmPanelButtons[0].onClick.RemoveAllListeners();
+        confirmPanelButtons[0].onClick.AddListener(delegate {
+            confirmPanel.SetActive(false);
+        });
+        confirmPanelButtons[0].GetComponentInChildren<Text>().text = "Mégsem";
+
+        confirmPanelButtons[1].GetComponentInChildren<Text>().text = "Ok";
+        confirmPanelButtons[1].onClick.RemoveAllListeners();
+        confirmPanelButtons[1].onClick.AddListener(delegate {
+            confirmPanel.SetActive(false);
+            Debug.Log("Quit");
+            Application.Quit();
+        });
+        confirmPanel.SetActive(true);
+
+
     }
 
     public void ExitToMainMenu()
     {
-        PlaySession.saveInfo.fileName = null;
-        PlaySession.saveInfo.levelName = null;
-        SwitchScene("MainMenu");
+        confirmPanelTexts[0].text = "Vissza a fûmenübe";
+        confirmPanelTexts[1].text = "Biztosan visszalépsz a fõmenübe?";
+        if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
+        {
+            confirmPanelTexts[1].text += "\nAz összes mentetlen haladás el fog veszni.";
+        }
+
+        confirmPanelButtons[0].onClick.RemoveAllListeners();
+        confirmPanelButtons[0].onClick.AddListener(delegate {
+            confirmPanel.SetActive(false);
+        });
+        confirmPanelButtons[0].GetComponentInChildren<Text>().text = "Mégsem";
+
+        confirmPanelButtons[1].GetComponentInChildren<Text>().text = "Ok";
+        confirmPanelButtons[1].onClick.RemoveAllListeners();
+        confirmPanelButtons[1].onClick.AddListener(delegate {
+            confirmPanel.SetActive(false);
+            PlaySession.saveInfo.fileName = null;
+            PlaySession.saveInfo.levelName = null;
+            SwitchScene("MainMenu");
+        });
+        confirmPanel.SetActive(true);
+
     }
 
     public void OpenSaveLoadMenu(int listType)

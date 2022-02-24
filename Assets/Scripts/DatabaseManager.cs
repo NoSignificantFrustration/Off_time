@@ -509,6 +509,13 @@ public class DatabaseManager : MonoBehaviour
         return winInfos;
     }
 
+    /// <summary>
+    /// Gets all user added quizes from database.
+    /// </summary>
+    /// <param name="orderByCol">Column the records should be ordered by</param>
+    /// <param name="sortingMode">Sorting mode (ASC/DESC)</param>
+    /// <returns>A generic object list that contains all user added QuizHandler.QuizDatas</returns>
+    /// <seealso cref="QuizHandler.QuizData"/>
     public List<object> GetUserQuizes(string orderByCol, bool sortingMode)
     {
         List<object> winInfos = new List<object>();
@@ -548,6 +555,10 @@ public class DatabaseManager : MonoBehaviour
         return winInfos;
     }
 
+    /// <summary>
+    /// Adds a new quiz with the provided QuizHandler.QuizData.
+    /// </summary>
+    /// <param name="data">Data to add</param>
     public void AddQuiz(QuizHandler.QuizData data)
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
@@ -563,6 +574,10 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Updates the quiz record with the given QuizHandler.QuizData 's id.
+    /// </summary>
+    /// <param name="data">Replacement QuizHandler.QuizData</param>
     public void UpdateQuiz(QuizHandler.QuizData data)
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
@@ -577,6 +592,10 @@ public class DatabaseManager : MonoBehaviour
         }
     }
 
+    /// <summary>
+    /// Deletes the quiz with the provided id.
+    /// </summary>
+    /// <param name="id">ID to be deleted</param>
     public void DeleteQuiz(int id)
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
