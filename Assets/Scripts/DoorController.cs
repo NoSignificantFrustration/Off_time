@@ -42,7 +42,7 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
     /// <summary>
     /// Sends the transform of this GameObject.
     /// </summary>
-    /// <returns>The transform of this GameObject</returns>
+    /// <returns>The transform of this GameObject.</returns>
     public Transform GetTransform()
     {
         return transform;

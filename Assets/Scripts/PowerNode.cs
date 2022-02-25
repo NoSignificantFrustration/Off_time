@@ -2,24 +2,42 @@ using System;
 using System.Collections;
 using UnityEngine;
 
-
+/// <summary>
+/// Power node logic.
+/// </summary>
+/// <seealso cref="IConnectable"/>
+/// <seealso cref="ISaveable"/>
+/// <seealso cref="NodeType"/>
+/// <seealso cref="PowerConnection"/>
 public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 {
-
+    /// <summary>Type of the node</summary>
     [SerializeField] private NodeType nodeType;
+    /// <summary>Determines which neighbours are connected. [0]: bottom, [1]: left side, [2]: top, [3]: right side</summary>
     [SerializeField] private BitArray connectionArray;
+    /// <summary>Determines which neighbours should be considered inputs (The same ordering scheme applies as with connectionArray)</summary>
     [SerializeField] private bool[] inputs = new bool[4];
+    /// <summary>Current rotation (Not to be confused with the actual GameObject's rotation)</summary>
     [SerializeField] [Min(0)] private int rotation;
+    /// <summary>Active state</summary>
     [SerializeField] private bool isActiated;
+    /// <summary>Locked state</summary>
     [SerializeField] private bool isLocked;
+    /// <summary>Some NodeTypes will want to do a pulse on startup to set up theit behavior, it can be skipped by setting this true</summary>
     [SerializeField] private bool skipInitialPulse;
+    /// <summary>List of neighbouring PowerConnections (The same ordering scheme applies as with connectionArray)</summary>
     [SerializeField] private PowerConnection[] neighbours = new PowerConnection[4];
+    /// <summary>List of sprites to be used</summary>
     [SerializeField] private Sprite[] sprites;
+    /// <summary>Unique ID</summary>
     [SerializeField] private string uid;
+    /// <summary>SpriteRenderer component</summary>
     private SpriteRenderer sr;
 
 
-
+    /// <summary>
+    /// Gets the connectionArray set up if it isn't already when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         if (connectionArray == null)
@@ -28,14 +46,19 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Prerotates the node.
+    /// </summary>
     public void PreRotate()
     {
-
+        //Only rotate if the nide type is meant to be rotated (Rotating logic nodes fe. would break them)
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
         {
+            //Reset the SpriteRenderer's rotation
             sr.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-            SetupConnections();
+            SetupConnections(); //Set up the connection and input array
             
+            //Rotate the sprite and shift the connectionArray to match the desired rotation
             for (int i = 0; i < rotation; i++)
             {
                 sr.transform.Rotate(Vector3.back * 90);
@@ -50,24 +73,25 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
-    void Start()
-    {
-        
-    }
 
+    /// <summary>
+    /// Initial setup of the node.
+    /// </summary>
     public void Startup()
     {
         LoadSprite();
         PreRotate();
-        if (isLocked)
+        if (isLocked) //Set the color to red is it's locked
         {
             sr.color = Color.red;
         }
+        //Pulse if the current node type demands it and it's not prohibited by skipInitialPulse
         if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse)
         {
             Pulse();
             //Debug.Log("Pulse");
         }
+        //Loop over all neighbours. If they exist, not an input and the connectionArray says they are connected set their state to the node's state and refresh their lines
         for (int i = 0; i < 4; i++)
         {
             if (!inputs[i] && neighbours[i] != null && connectionArray[i])
@@ -81,12 +105,9 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-
-    }
-
+    /// <summary>
+    /// Turns the node 90° clockwise.
+    /// </summary>
     void Turn()
     {
         if (isLocked)
@@ -94,12 +115,15 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
             return;
         }
 
-        PlaySession.saveInfo.moves++;
+        PlaySession.saveInfo.moves++; //Increment the move counter
 
+        //Only rotate if the nide type is meant to be rotated (Rotating logic nodes fe. would break them)
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
         {
-            //Debug.Log(sr.transform.localRotation);
-            sr.transform.Rotate(Vector3.back * 90);
+            
+            sr.transform.Rotate(Vector3.back * 90); //Rotate the sprite 90°
+
+            //Shift the connectionArray
             BitArray tempArray = new BitArray(4);
             tempArray[0] = connectionArray[3];
             for (int i = 0; i < 3; i++)
@@ -124,6 +148,9 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 
     }
 
+    /// <summary>
+    /// Reevaluates the node's active state and toggles outputs.
+    /// </summary>
     public void Pulse()
     {
 
@@ -137,6 +164,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         {
 
             case NodeType.Source:
+                //Loop through all existing neighbours and toggle them on
                 for (int i = 0; i < 4; i++)
                 {
                     if (neighbours[i] != null)
@@ -159,6 +187,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 TurnEvaluate();
                 break;
             case NodeType.NOT:
+                //neighbours[0] is considered the only input, isActiated will be set to it's opposite
                 if (isActiated == neighbours[0].GetActive())
                 {
                     isActiated = !isActiated;
@@ -174,7 +203,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 
                 break;
             case NodeType.AND:
-
+                //Neighbours[0] and neighbours[1] are inputs, AND operation
                 if (neighbours[0].GetActive() && neighbours[1].GetActive())
                 {
                     tempActive = true;
@@ -197,6 +226,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
                 break;
             case NodeType.OR:
+                //Neighbours[0] and neighbours[1] are inputs, OR operation
                 if (neighbours[0].GetActive() || neighbours[1].GetActive())
                 {
                     tempActive = true;
@@ -219,6 +249,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
                 break;
             case NodeType.NAND:
+                //Neighbours[0] and neighbours[1] are inputs, NAND operation
                 if (neighbours[0].GetActive() && neighbours[1].GetActive())
                 {
                     tempActive = false;
@@ -241,6 +272,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
                 break;
             case NodeType.NOR:
+                //Neighbours[0] and neighbours[1] are inputs, NOR operation
                 if (neighbours[0].GetActive() || neighbours[1].GetActive())
                 {
                     tempActive = false;
@@ -263,6 +295,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
                 break;
             case NodeType.XOR:
+                //Neighbours[0] and neighbours[1] are inputs, XOR operation
                 if (neighbours[0].GetActive() != neighbours[1].GetActive())
                 {
                     tempActive = true;
@@ -285,7 +318,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
                 break;
             case NodeType.XNOR:
-
+                //Neighbours[0] and neighbours[1] are inputs, XNOR operation
                 if (neighbours[0].GetActive() == neighbours[1].GetActive())
                 {
                     tempActive = true;
@@ -312,9 +345,13 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Determines the node's active state and toggles neighbors according to it and the connections array.
+    /// </summary>
     private void TurnEvaluate()
     {
         bool tempActive = false;
+        //Determine active state
         for (int i = 0; i < 4; i++)
         {
             if (connectionArray[i] && inputs[i])
@@ -327,12 +364,15 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
             }
         }
 
+        //Toggle neighbours accordingly
         if (tempActive)
         {
             for (int i = 0; i < 4; i++)
             {
-                if (neighbours[i] != null && !inputs[i])
+                //If there is a neighbour on the current index that is not an input toggle it
+                if (neighbours[i] != null && !inputs[i]) 
                 {
+                    //If it's connected toggle it on, if it's not toggle it off
                     if (connectionArray[i])
                     {
                         neighbours[i].Toggle(true);
@@ -346,6 +386,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
         else
         {
+            //Toggle all non-input neighbours off
             for (int i = 0; i < 4; i++)
             {
                 if (neighbours[i] != null && !inputs[i])
@@ -354,6 +395,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 }
             }
         }
+        //If the active state changed store it and load the appropriate sprites
         if (isActiated != tempActive)
         {
             isActiated = tempActive;
@@ -362,6 +404,9 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
 
     }
 
+    /// <summary>
+    /// Sets up the connectionArray and inputs arrays according to the NodeType.
+    /// </summary>
     public void SetupConnections()
     {
         switch (nodeType)
@@ -420,6 +465,9 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         sr = GetComponent<SpriteRenderer>();
     }
 
+    /// <summary>
+    /// Loads the appropriate sprite according to the isActiated state and NodeType.
+    /// </summary>
     public void LoadSprite()
     {
         if (isLocked)
@@ -559,12 +607,21 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     }
 
 
-
+    /// <summary>
+    /// Sets the neigbour on the specified index (For internal use).
+    /// </summary>
+    /// <param name="index">neighbours array index</param>
+    /// <param name="connection">The new PowerConnection</param>
     public void SetNeighbour(int index, PowerConnection connection)
     {
         neighbours[index] = connection;
     }
 
+    /// <summary>
+    /// Turns the node when the player clicks on it.
+    /// </summary>
+    /// <param name="drone">Player drone</param>
+    /// <seealso cref="DroneController"/>
     public void Click(DroneController drone)
     {
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T)
@@ -573,16 +630,29 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Unlocks the node.
+    /// </summary>
     public void Unlock()
     {
         isLocked = false;
         sr.color = Color.white;
     }
+
+    /// <summary>
+    /// Gets the neighbour on the specified index.
+    /// </summary>
+    /// <param name="nIndex">Index</param>
+    /// <returns>Requested PowerConnection</returns>
     public PowerConnection GetNeighbor(int nIndex)
     {
         return neighbours[nIndex];
     }
 
+    /// <summary>
+    /// Gets the active state.
+    /// </summary>
+    /// <returns>Active state.</returns>
     public bool GetActive()
     {
         return isActiated;
@@ -593,11 +663,21 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         Debug.Log(gameObject.name + " Needs to be pulsed, not toggled.");
     }
 
+    /// <summary>
+    /// Gets the transform of this GameObject.
+    /// </summary>
+    /// <returns>The transform of this GameObject.</returns>
     public Transform GetTransform()
     {
         return gameObject.transform;
     }
 
+    /// <summary>
+    /// Adds this node's information to the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
+    /// <seealso cref="SaveData"/>
+    /// <seealso cref="SaveData.NodeData"/>
     public void AddToSave(SaveData saveData)
     {
         SaveData.NodeData data = new SaveData.NodeData();
@@ -608,6 +688,10 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         saveData.nodeDatas.Add(data);
     }
 
+    /// <summary>
+    /// Loads the node's information from the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
     public void LoadFromSave(SaveData saveData)
     {
         foreach (SaveData.NodeData item in saveData.nodeDatas)
@@ -623,6 +707,11 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// For internal use. Returns this object if it has no uid or is forced to.
+    /// </summary>
+    /// <param name="force">Force state</param>
+    /// <returns>The object.</returns>
     public UnityEngine.Object GetObject(bool force = false)
     {
         if (uid == null || uid == "" || force)
@@ -632,6 +721,9 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         return null;
     }
 
+    /// <summary>
+    /// Node type enum.
+    /// </summary>
     public enum NodeType
     {
         Source, I, L, T, X, NOT, AND, OR, NAND, NOR, XOR, XNOR

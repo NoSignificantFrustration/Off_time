@@ -4,26 +4,47 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
+/// <summary>
+/// Quiz record adder logic.
+/// </summary>
+/// <seealso cref="DatabaseManager"/>
+/// <seealso cref="UIEventHandler"/>
+/// <seealso cref="QuizHandler.QuizData"/>
 public class RecordAdder : MonoBehaviour
 {
-
+    /// <summary>Database manager</summary>
     [SerializeField] private DatabaseManager databaseManager;
+    /// <summary>U event handler</summary>
     [SerializeField] private UIEventHandler uIEventHandler;
+    /// <summary>Difficulty input</summary>
     [SerializeField] private Dropdown difficultyInput;
+    /// <summary>Input fields</summary>
     [SerializeField] private InputField[] quesionInputs = new InputField[5];
+    /// <summary>Confirm button</summary>
     [SerializeField] private Button confirmButton;
+    /// <summary>Back button</summary>
     [SerializeField] private Button backButton;
+    /// <summary>Feedback panel</summary>
     [SerializeField] private GameObject feedbackPanel;
+    /// <summary>Feedback panel text fields</summary>
     [SerializeField] private Text[] feedbackTexts = new Text[2];
+    /// <summary>Feedback panel button</summary>
     [SerializeField] private Button feedbackPanelButton;
+    /// <summary>The QuizData we are working with</summary>
     private QuizHandler.QuizData quizData;
 
+    /// <summary>
+    /// Reinitialises the UI elements and fills the inputs with the provided QuizHandler.QuizData.
+    /// </summary>
+    /// <param name="data">Provided QuizHandler.QuizData</param>
     public void Refresh(QuizHandler.QuizData data)
     {
         feedbackPanel.SetActive(false);
 
+        //Store the data
         quizData = data;
 
+        //Fill in the input fields
         difficultyInput.value = data.difficulty;
         quesionInputs[0].text = data.question;
         quesionInputs[1].text = data.good_answer;
@@ -32,6 +53,7 @@ public class RecordAdder : MonoBehaviour
             quesionInputs[i + 2].text = data.bad_answers[i];
         }
 
+        //Configure the buttons
         backButton.onClick.RemoveAllListeners();
         backButton.onClick.AddListener(delegate {
             uIEventHandler.GetSaveLoadMenu().GetComponentInChildren<DynamicListManager>().LoadButtons();
@@ -43,6 +65,9 @@ public class RecordAdder : MonoBehaviour
         confirmButton.GetComponentInChildren<Text>().text = "Mentés";
     }
 
+    /// <summary>
+    /// Reinitialises the UI elements.
+    /// </summary>
     public void Refresh()
     {
         feedbackPanel.SetActive(false);
@@ -53,6 +78,7 @@ public class RecordAdder : MonoBehaviour
 
         }
 
+        //Configure the buttons
         backButton.onClick.RemoveAllListeners();
         backButton.onClick.AddListener(delegate {
             uIEventHandler.GetSaveLoadMenu().GetComponentInChildren<DynamicListManager>().LoadButtons();
@@ -64,8 +90,12 @@ public class RecordAdder : MonoBehaviour
         confirmButton.GetComponentInChildren<Text>().text = "Hozzáadás";
     }
 
-    
 
+    /// <summary>
+    /// Tries to make a QuizHandler.QuizData with the contents of the inputs.
+    /// </summary>
+    /// <param name="result">The resulting QuizHandler.QuizData</param>
+    /// <returns>True if the operation succeeded, false if it didn't.</returns>
     private bool TryMakeQuizData(out QuizHandler.QuizData result)
     {
 
@@ -73,6 +103,7 @@ public class RecordAdder : MonoBehaviour
         result = new QuizHandler.QuizData();
         result.id = 0;
 
+        //Check if any of the inputs are empty or contain illegal characters
         for (int i = 0; i < quesionInputs.Length; i++)
         {
 
@@ -101,6 +132,7 @@ public class RecordAdder : MonoBehaviour
             }
         }
 
+        //Store the contents
         result.difficulty = difficultyInput.value;
         result.question = quesionInputs[0].text;
         result.good_answer = quesionInputs[1].text;
@@ -113,6 +145,9 @@ public class RecordAdder : MonoBehaviour
         return true;
     }
 
+    /// <summary>
+    /// Updates the provided quiz.
+    /// </summary>
     public void UpdateQuiz()
     {
 
@@ -136,7 +171,9 @@ public class RecordAdder : MonoBehaviour
     }
 
     
-
+    /// <summary>
+    /// Adds a new quiz.
+    /// </summary>
     public void AddQuiz()
     {
         if (TryMakeQuizData(out QuizHandler.QuizData data))
@@ -160,9 +197,9 @@ public class RecordAdder : MonoBehaviour
         
     }
 
-
-    
-
+    /// <summary>
+    /// Closes the quiz record adder.
+    /// </summary>
     public void Close()
     {
         uIEventHandler.CloseMenu();
