@@ -242,6 +242,9 @@ public class MainMenuManager : MonoBehaviour
         eventHandler.CloseRoot();
     }
 
+    /// <summary>
+    /// Opens the level select menu and makes level select buttons available according to their largest completed level.
+    /// </summary>
     public void OpenLevelSelect()
     {
         for (int i = 0; i < levelSelectButtons.Length; i++)

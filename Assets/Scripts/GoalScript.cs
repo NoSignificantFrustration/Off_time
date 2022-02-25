@@ -39,6 +39,7 @@ public class GoalScript : MonoBehaviour, IConnectable
     {
         if (input.GetActive())
         {
+            //Make the next level accessible if the current level is the highest level they can access
             if (PlaySession.currentLevel == gameController.levelNumber)
             {
                 PlaySession.currentLevel++;

@@ -20,17 +20,20 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
     [SerializeField] private float range;
     /// <summary>The blocker's sprites</summary>
     [SerializeField] private Sprite[] sprites;
-    /// <summary></summary>
+    /// <summary>Active state</summary>
     [SerializeField] private bool isActivated = false;
-    /// <summary></summary>
+    /// <summary>Locked state</summary>
     [SerializeField] private bool isLocked = true;
-    /// <summary></summary>
+    /// <summary>Unique ID</summary>
     [SerializeField] private string uid;
-    /// <summary></summary>
+    /// <summary>Is the player in range?</summary>
     private bool in_range;
-    /// <summary></summary>
+    /// <summary>SpriteRenderer component</summary>
     private SpriteRenderer sr;
 
+    /// <summary>
+    /// Loads the sprite appropriate to the blocker's state.
+    /// </summary>
     public void LoadSprite()
     {
         if (isLocked)
@@ -50,11 +53,18 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Gets the trandform of the GameObject.
+    /// </summary>
+    /// <returns>The GameObject's transform.</returns>
     public Transform GetTransform()
     {
         return transform;
     }
 
+    /// <summary>
+    /// Sets the blocker's active state to match it's input's and refreshes the sprite.
+    /// </summary>
     public void Pulse()
     {
         isActivated = input.GetActive();
@@ -66,12 +76,20 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         
     }
 
+    /// <summary>
+    /// Gets a reference to the SpriteRenderer component when the script is loaded.
+    /// </summary>
     private void Awake()
     {
         sr = GetComponent<SpriteRenderer>();
         
     }
 
+    /// <summary>
+    /// Starts a quiz if the node is activated,locked and in range.
+    /// </summary>
+    /// <param name="drone">Reference to the player</param>
+    /// <seealso cref="DroneController"/>
     public void Click(DroneController drone)
     {
 
@@ -83,6 +101,9 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Unlocks the blocker and connected node.
+    /// </summary>
     public void Unlock()
     {
         isLocked = false;
@@ -90,13 +111,10 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         output.Pulse();
         LoadSprite();
     }
-
-    // Start is called before the first frame update
-    void Start()
-    {
-
-    }
-
+    
+    /// <summary>
+    /// Initial setup.
+    /// </summary>
     public void Startup()
     {
         LoadSprite();
@@ -107,6 +125,9 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         //Debug.Log(uid);
     }
 
+    /// <summary>
+    /// Checks if the player is in range, and anbles or disables interactability based on that.
+    /// </summary>
     // Update is called once per frame
     void Update()
     {
@@ -117,6 +138,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
 
         bool tempState;
 
+        //Check if player is in range
         if (Vector3.Distance(GameController.GetPlayer().transform.position, transform.position) <= range)
         {
             tempState = true;
@@ -126,6 +148,7 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
             tempState = false;
         }
 
+        //If the in range state changed change the sprite's color
         if (in_range != tempState)
         {
             in_range = tempState;
@@ -140,6 +163,12 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// Adds this node's information to the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
+    /// <seealso cref="SaveData"/>
+    /// <seealso cref="SaveData.BlockerData"/>
     public void AddToSave(SaveData saveData)
     {
         SaveData.BlockerData data = new SaveData.BlockerData();
@@ -149,6 +178,10 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         saveData.blockerDatas.Add(data);
     }
 
+    /// <summary>
+    /// Loads the blocker's information from the provided SaveData.
+    /// </summary>
+    /// <param name="saveData">The provided SaveData</param>
     public void LoadFromSave(SaveData saveData)
     {
         foreach (SaveData.BlockerData item in saveData.blockerDatas)
@@ -163,6 +196,11 @@ public class NodeBlocker : MonoBehaviour, IConnectable, ISaveable
         }
     }
 
+    /// <summary>
+    /// For internal use. Returns this object if it has no uid or is forced to.
+    /// </summary>
+    /// <param name="force">Force state</param>
+    /// <returns>The object.</returns>
     public UnityEngine.Object GetObject(bool force = false)
     {
         if (uid == null || uid == "" || force)

@@ -48,6 +48,9 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
         return transform;
     }
 
+    /// <summary>
+    /// Sets the door's state based on the input's state.
+    /// </summary>
     public void Pulse()
     {
         bool tempActive = input.GetActive();
@@ -123,7 +126,7 @@ public class DoorController : MonoBehaviour, IConnectable, ISaveable
     /// For internal use. Returns this object if it has no uid or is forced to.
     /// </summary>
     /// <param name="force">Force state</param>
-    /// <returns></returns>
+    /// <returns>The object.</returns>
     public UnityEngine.Object GetObject(bool force = false)
     {
         if (uid == null || uid == "" || force)

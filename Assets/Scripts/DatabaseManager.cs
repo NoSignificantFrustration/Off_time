@@ -305,6 +305,9 @@ public class DatabaseManager : MonoBehaviour
         return success;
     }
 
+    /// <summary>
+    /// Updates the user's level in the database.
+    /// </summary>
     public void UpdateUserCurrentLevel()
     {
         using (SqliteConnection connection = new SqliteConnection(connectionPath))
