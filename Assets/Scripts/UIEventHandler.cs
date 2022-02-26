@@ -17,6 +17,7 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private QuizHandler quizHandler;
     [SerializeField] private GameObject saveLoadMenu;
     [SerializeField] private RecordAdder quizRecordAdder;
+    [SerializeField] private WinMenu winMenu;
     [SerializeField] private GameObject confirmPanel;
     [SerializeField] private Text[] confirmPanelTexts;
     [SerializeField] private Button[] confirmPanelButtons;
@@ -150,30 +151,40 @@ public class UIEventHandler : MonoBehaviour
 
     }
 
-    public void ExitToMainMenu()
+    public void ExitToMainMenu(bool showWarning)
     {
-        confirmPanelTexts[0].text = "Vissza a fûmenübe";
-        confirmPanelTexts[1].text = "Biztosan visszalépsz a fõmenübe?";
-        if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
+        if (showWarning)
         {
-            confirmPanelTexts[1].text += "\nAz összes mentetlen haladás el fog veszni.";
+            confirmPanelTexts[0].text = "Vissza a fûmenübe";
+            confirmPanelTexts[1].text = "Biztosan visszalépsz a fõmenübe?";
+            if (!SceneManager.GetActiveScene().name.Equals("MainMenu"))
+            {
+                confirmPanelTexts[1].text += "\nAz összes mentetlen haladás el fog veszni.";
+            }
+
+            confirmPanelButtons[0].onClick.RemoveAllListeners();
+            confirmPanelButtons[0].onClick.AddListener(delegate {
+                confirmPanel.SetActive(false);
+            });
+            confirmPanelButtons[0].GetComponentInChildren<Text>().text = "Mégsem";
+
+            confirmPanelButtons[1].GetComponentInChildren<Text>().text = "Ok";
+            confirmPanelButtons[1].onClick.RemoveAllListeners();
+            confirmPanelButtons[1].onClick.AddListener(delegate {
+                confirmPanel.SetActive(false);
+                PlaySession.saveInfo.fileName = null;
+                PlaySession.saveInfo.levelName = null;
+                SwitchScene("MainMenu");
+            });
+            confirmPanel.SetActive(true);
         }
-
-        confirmPanelButtons[0].onClick.RemoveAllListeners();
-        confirmPanelButtons[0].onClick.AddListener(delegate {
-            confirmPanel.SetActive(false);
-        });
-        confirmPanelButtons[0].GetComponentInChildren<Text>().text = "Mégsem";
-
-        confirmPanelButtons[1].GetComponentInChildren<Text>().text = "Ok";
-        confirmPanelButtons[1].onClick.RemoveAllListeners();
-        confirmPanelButtons[1].onClick.AddListener(delegate {
-            confirmPanel.SetActive(false);
+        else
+        {
             PlaySession.saveInfo.fileName = null;
             PlaySession.saveInfo.levelName = null;
             SwitchScene("MainMenu");
-        });
-        confirmPanel.SetActive(true);
+        }
+        
 
     }
 
@@ -254,6 +265,12 @@ public class UIEventHandler : MonoBehaviour
     {
         PlaySession.saveInfo = new SaveGameInfo("SampleScene");
         SwitchScene("SampleScene");
+    }
+
+    public void OpenWinMenu()
+    {
+        winMenu.UpdateTexts();
+        OpenMenuAsRoot(winMenu.gameObject);
     }
 
     private void OnEnable()

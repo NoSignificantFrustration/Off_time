@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.UI;
 
 /// <summary>
 /// Quiz handdler logic.
@@ -13,6 +15,8 @@ public class QuizHandler : MonoBehaviour
     [SerializeField] private Color disabledColor;
     /// <summary>Question text field</summary>
     [SerializeField] private Text questionText;
+    /// <summary>Feedback text field</summary>
+    [SerializeField] private Text feedbackText;
     /// <summary>Database manager</summary>
     [SerializeField] private DatabaseManager databaseManager;
     /// <summary>UI event handler</summary>
@@ -28,6 +32,8 @@ public class QuizHandler : MonoBehaviour
     /// <seealso cref="QuizData"/>
     public void StartQuiz()
     {
+        feedbackText.gameObject.SetActive(false);
+
         //Reset cb
         cb = answerButtons[0].colors;
         cb.disabledColor = disabledColor;
@@ -88,6 +94,7 @@ public class QuizHandler : MonoBehaviour
             uiEventHandler.FinishQuiz(false);
         }
 
+        feedbackText.gameObject.SetActive(true);
 
 
     }

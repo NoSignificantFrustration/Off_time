@@ -178,7 +178,7 @@ public class DatabaseManager : MonoBehaviour
             connection.Open();
             using (SqliteCommand command = connection.CreateCommand())
             {
-                command.CommandText = "SELECT * FROM questions ORDER BY RANDOM() LIMIT 1";
+                command.CommandText = $"SELECT * FROM questions WHERE difficulty = '{PlaySession.saveInfo.difficulty}' ORDER BY RANDOM() LIMIT 1";
                 command.ExecuteNonQuery();
 
                 using (IDataReader reader = command.ExecuteReader())

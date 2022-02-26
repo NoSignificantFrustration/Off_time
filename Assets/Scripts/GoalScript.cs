@@ -46,19 +46,19 @@ public class GoalScript : MonoBehaviour, IConnectable
                 gameController.databaseManager.UpdateUserCurrentLevel();
             }
             gameController.databaseManager.AddWin();
-            SceneManager.LoadScene(nextLevel);
+            GetComponent<SpriteRenderer>().color = Color.green;
+            transform.GetChild(0).gameObject.SetActive(false);
+
+            Time.timeScale = 0f;
+            gameController.uIEventHandler.OpenWinMenu();
+            gameController.uIEventHandler.escapePressedEvent.AddListener(delegate { gameController.uIEventHandler.ExitToMainMenu(false); });
+            
         }
         
     }
 
-    /// <summary>
-    /// Loads the next level when the node is powered.
-    /// </summary>
     public void Toggle(bool state)
     {
-        if (state)
-        {
-            SceneManager.LoadScene(nextLevel);
-        }
+        
     }
 }

@@ -967,7 +967,7 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.LoadList:
                     colHeaderNames = new string[] { "Mentésnév", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Mentés ideje" };
                     colDatabaseFields = new string[] { "title", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, false, false, false, false };
+                    defaultSortingMode = new bool[] { true, true, false, true, true, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };
@@ -975,7 +975,7 @@ public class DynamicListManager : MonoBehaviour
                 case DynamicListType.LeaderboardList:
                     colHeaderNames = new string[] { "Felhasználó", "Pályanév", "Nehézség", "Lépések", "Játékidõ", "Teljesítés ideje" };
                     colDatabaseFields = new string[] { "userID", "levelName", "difficulty", "moves", "elapsedTime", "savetime" };
-                    defaultSortingMode = new bool[] { true, true, false, false, false, false };
+                    defaultSortingMode = new bool[] { true, true, false, true, true, false };
                     textRectAnchors = new float[] { 0f, 0.3765f, 0.5527f, 0.6645f, 0.74f, 0.8434f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter, TextAnchor.MiddleCenter };

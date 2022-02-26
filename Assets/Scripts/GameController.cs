@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using UnityEngine;
+using Cinemachine;
 
 /// <summary>
 /// Handles important game functions like saving and loading. Only one GameController per scene.
@@ -10,12 +11,18 @@ public class GameController : MonoBehaviour
 {
     /// <summary>Database manager</summary>
     [SerializeField] public DatabaseManager databaseManager;
+    /// <summary>UI event handler</summary>
+    [SerializeField] public UIEventHandler uIEventHandler;
     /// <summary>Level number</summary>
     [SerializeField] public int levelNumber;
+    /// <summary>Main camera's CinemachineBrain</summary>
+    [SerializeField] public CinemachineBrain cinemachineBrain;
     /// <summary>References to all the nodes</summary>
-    private static GameObject[] nodes;
+    private GameObject[] nodes;
+    /// <summary>Reference to the source node</summary>
+    [SerializeField] private GameObject sourceNode;
     /// <summary>References to all the blockers</summary>
-    private static GameObject[] blockers;
+    private GameObject[] blockers;
     /// <summary>Reference to the player</summary>
     private static GameObject player;
     /// <summary>References to all ISaveable interfaces in the scene</summary>
@@ -41,6 +48,8 @@ public class GameController : MonoBehaviour
         {
             item.Startup();
         }
+
+        sourceNode.GetComponent<ISaveable>().Startup();
     }
 
     /// <summary>
@@ -65,7 +74,11 @@ public class GameController : MonoBehaviour
         saveables = new List<ISaveable>();
         foreach (GameObject item in nodes)
         {
-            saveables.Add(item.GetComponent<ISaveable>());
+            if (item != sourceNode)
+            {
+                saveables.Add(item.GetComponent<ISaveable>());
+            }
+            
         }
         foreach (GameObject item in blockers)
         {
@@ -179,5 +192,6 @@ public class GameController : MonoBehaviour
     {
         return player;
     }
+
 
 }

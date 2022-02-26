@@ -37,6 +37,12 @@ public class MainMenuManager : MonoBehaviour
     [SerializeField] private GameObject levelSelectMenu;
     /// <summary>Level selection buttons</summary>
     [SerializeField] private Button[] levelSelectButtons;
+    /// <summary>New game panel</summary>
+    [SerializeField] private GameObject newGamePanel;
+    /// <summary>Difficulty dropdown</summary>
+    [SerializeField] private Dropdown difficultyDropdown;
+    /// <summary>New game panel buttons</summary>
+    [SerializeField] private Button[] newGameButtons;
 
 
     /// <summary>
@@ -247,6 +253,8 @@ public class MainMenuManager : MonoBehaviour
     /// </summary>
     public void OpenLevelSelect()
     {
+        newGamePanel.SetActive(false);
+
         for (int i = 0; i < levelSelectButtons.Length; i++)
         {
             if (i + 1 <= PlaySession.currentLevel)
@@ -259,6 +267,21 @@ public class MainMenuManager : MonoBehaviour
             }
         }
         eventHandler.OpenMenu(levelSelectMenu);
+    }
+
+    public void OpenNewGamePanel(string levelName)
+    {
+        newGamePanel.SetActive(true);
+
+        newGameButtons[0].onClick.RemoveAllListeners();
+        newGameButtons[0].onClick.AddListener( delegate { newGamePanel.SetActive(false); });
+
+        newGameButtons[1].onClick.RemoveAllListeners();
+        newGameButtons[1].onClick.AddListener(delegate { 
+            PlaySession.saveInfo = new SaveGameInfo(levelName);
+            PlaySession.saveInfo.difficulty = difficultyDropdown.value;
+            eventHandler.SwitchScene(levelName);
+        });
     }
 
 }

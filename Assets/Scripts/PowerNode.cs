@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using UnityEngine;
 
@@ -23,6 +22,8 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     [SerializeField] private bool isActiated;
     /// <summary>Locked state</summary>
     [SerializeField] private bool isLocked;
+    /// <summary>Is rotation locked</summary>
+    [SerializeField] private bool nonRotatable;
     /// <summary>Some NodeTypes will want to do a pulse on startup to set up theit behavior, it can be skipped by setting this true</summary>
     [SerializeField] private bool skipInitialPulse;
     /// <summary>List of neighbouring PowerConnections (The same ordering scheme applies as with connectionArray)</summary>
@@ -51,17 +52,19 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     /// </summary>
     public void PreRotate()
     {
-        //Only rotate if the nide type is meant to be rotated (Rotating logic nodes fe. would break them)
-        if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
+
+        //Reset the SpriteRenderer's rotation
+        sr.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+        SetupConnections(); //Set up the connection and input array
+
+        //Rotate the sprite and shift the connectionArray to match the desired rotation
+        for (int i = 0; i < rotation; i++)
         {
-            //Reset the SpriteRenderer's rotation
-            sr.transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
-            SetupConnections(); //Set up the connection and input array
-            
-            //Rotate the sprite and shift the connectionArray to match the desired rotation
-            for (int i = 0; i < rotation; i++)
+            sr.transform.Rotate(Vector3.back * 90);
+
+            //Only shift if the node type is meant to be rotated (Rotating logic nodes fe. would break them)
+            if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
             {
-                sr.transform.Rotate(Vector3.back * 90);
                 BitArray tempArray = new BitArray(4);
                 tempArray[0] = connectionArray[3];
                 for (int j = 0; j < 3; j++)
@@ -71,6 +74,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
                 connectionArray = tempArray;
             }
         }
+
     }
 
 
@@ -84,6 +88,10 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         if (isLocked) //Set the color to red is it's locked
         {
             sr.color = Color.red;
+        }
+        else if (nonRotatable)
+        {
+            sr.color = Color.green;
         }
         //Pulse if the current node type demands it and it's not prohibited by skipInitialPulse
         if ((nodeType == NodeType.Source || nodeType == NodeType.NOT || nodeType == NodeType.NAND || nodeType == NodeType.NOR || nodeType == NodeType.XNOR) && !skipInitialPulse)
@@ -110,7 +118,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     /// </summary>
     void Turn()
     {
-        if (isLocked)
+        if (isLocked || nonRotatable)
         {
             return;
         }
@@ -120,7 +128,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
         //Only rotate if the nide type is meant to be rotated (Rotating logic nodes fe. would break them)
         if (nodeType == NodeType.I || nodeType == NodeType.L || nodeType == NodeType.T || nodeType == NodeType.X)
         {
-            
+
             sr.transform.Rotate(Vector3.back * 90); //Rotate the sprite 90°
 
             //Shift the connectionArray
@@ -370,7 +378,7 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
             for (int i = 0; i < 4; i++)
             {
                 //If there is a neighbour on the current index that is not an input toggle it
-                if (neighbours[i] != null && !inputs[i]) 
+                if (neighbours[i] != null && !inputs[i])
                 {
                     //If it's connected toggle it on, if it's not toggle it off
                     if (connectionArray[i])
@@ -636,7 +644,15 @@ public class PowerNode : MonoBehaviour, IConnectable, ISaveable
     public void Unlock()
     {
         isLocked = false;
-        sr.color = Color.white;
+        if (nonRotatable)
+        {
+            sr.color = Color.green;
+        }
+        else
+        {
+
+            sr.color = Color.white;
+        }
     }
 
     /// <summary>
