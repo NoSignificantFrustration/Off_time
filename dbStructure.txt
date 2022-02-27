@@ -10,7 +10,7 @@ questions:
 	"bad_answer2"	varchar(40) NOT NULL,
 	"bad_answer3"	varchar(40) NOT NULL,
 	"user_added"	INTEGER(1) NOT NULL DEFAULT 0,
-	PRIMARY KEY("id" AUTOINCREMENT)
+	PRIMARY KEY("id" AUTOINCREMENT))
 )
 
 users: 
