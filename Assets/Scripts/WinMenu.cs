@@ -4,11 +4,17 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
+/// Win menu logic.
+/// </summary>
 public class WinMenu : MonoBehaviour
 {
+    /// <summary>Display text field</summary>
     [SerializeField] Text displayTextField;
 
-
+    /// <summary>
+    /// Updates the text field with the current values.
+    /// </summary>
     public void UpdateTexts()
     {
         string[] difficultyNames = new string[] { "Könnyû", "Közepes", "Nehéz" };
@@ -19,17 +25,4 @@ public class WinMenu : MonoBehaviour
             $"\n\nLépések száma: {PlaySession.saveInfo.moves}";
     }
 
-
-
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
 }
