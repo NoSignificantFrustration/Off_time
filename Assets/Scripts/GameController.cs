@@ -88,20 +88,6 @@ public class GameController : MonoBehaviour
 
     }
 
-
-    /// <summary>
-    /// Increments the elapsed time counter every frame when the game is not paused.
-    /// </summary>
-    // Update is called once per frame
-    void Update()
-    {
-        if (!UIEventHandler.isPaused)
-        {
-            PlaySession.saveInfo.elapsedTime += Time.deltaTime;
-        }
-        
-    }
-
  
     /// <summary>
     /// Saves the game and calls for the database to be updated accordingly.

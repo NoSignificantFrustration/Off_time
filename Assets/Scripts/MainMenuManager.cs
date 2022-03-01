@@ -269,13 +269,19 @@ public class MainMenuManager : MonoBehaviour
         eventHandler.OpenMenu(levelSelectMenu);
     }
 
+    /// <summary>
+    /// Opens the new save panel with the specified level name.
+    /// </summary>
+    /// <param name="levelName">Level name</param>
     public void OpenNewGamePanel(string levelName)
     {
         newGamePanel.SetActive(true);
 
+        //Set up cancel button
         newGameButtons[0].onClick.RemoveAllListeners();
         newGameButtons[0].onClick.AddListener( delegate { newGamePanel.SetActive(false); });
 
+        //Set up start button
         newGameButtons[1].onClick.RemoveAllListeners();
         newGameButtons[1].onClick.AddListener(delegate { 
             PlaySession.saveInfo = new SaveGameInfo(levelName);

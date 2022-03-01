@@ -14,4 +14,7 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/2. Szint.unity
     guid: 2cda990e2423bbf4892e6590ba056729
+  - enabled: 1
+    path: Assets/Scenes/3. Szint.unity
+    guid: ddecf245f4660ac42bfd81a053a01666
   m_configObjects: {}

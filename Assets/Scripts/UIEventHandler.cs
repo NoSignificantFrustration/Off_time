@@ -38,6 +38,8 @@ public class UIEventHandler : MonoBehaviour
     [SerializeField] private Text[] confirmPanelTexts;
     /// <summary>Confirmation panel buttons</summary>
     [SerializeField] private Button[] confirmPanelButtons;
+    /// <summary>Text that displays the elapsed time</summary>
+    [SerializeField] private Text timeText;
     /// <summary>Input asset</summary>
     public PlayerInputAsset controls { get; private set; }
     /// <summary>Escape pressed event</summary>
@@ -51,9 +53,9 @@ public class UIEventHandler : MonoBehaviour
     /// <summary>Reference to the player drone</summary>
     private DroneController drone;
     /// <summary>Login regex string</summary>
-    public const static string loginRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9_]";
+    public static string loginRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9_]";
     /// <summary>General regex string</summary>
-    public const static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.()-]";
+    public static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.()-]";
 
     /// <summary>
     /// Gets needed references and subscribes CloseMenu to the escape button event.
@@ -67,6 +69,19 @@ public class UIEventHandler : MonoBehaviour
         controls.UI.Pause.performed += Escape;
         escapePressedEvent = new UnityEvent();
         isPaused = false;
+    }
+
+    /// <summary>
+    /// Increments the elapsed time counter every frame when the game is not paused.
+    /// </summary>
+    // Update is called once per frame
+    void Update()
+    {
+        if (!isPaused || currentUI == quizMenu)
+        {
+            PlaySession.saveInfo.elapsedTime += Time.unscaledDeltaTime;
+            timeText.text = TimeSpan.FromSeconds(PlaySession.saveInfo.elapsedTime).ToString("hh':'mm':'ss");
+        }
     }
 
     /// <summary>
@@ -345,17 +360,6 @@ public class UIEventHandler : MonoBehaviour
 
     }
 
-    public void LoadFromSave()
-    {
-        // TODO
-        SwitchScene("SampleScene");
-    }
-
-    public void StartNewGame()
-    {
-        PlaySession.saveInfo = new SaveGameInfo("SampleScene");
-        SwitchScene("SampleScene");
-    }
 
     /// <summary>
     /// Opens the win menu.
@@ -364,6 +368,7 @@ public class UIEventHandler : MonoBehaviour
     {
         winMenu.UpdateTexts();
         OpenMenuAsRoot(winMenu.gameObject);
+        timeText.gameObject.SetActive(false);
     }
 
     /// <summary>
