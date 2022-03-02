@@ -1545,7 +1545,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6376852882715292728, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Quit
+      value: QuitButtonPressed
       objectReference: {fileID: 0}
     - target: {fileID: 6376852882715292728, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -1858,7 +1858,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -180}
+  m_AnchoredPosition: {x: 0.000015259, y: -267}
   m_SizeDelta: {x: 669.0748, y: 242.5046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &483220663
@@ -2311,7 +2311,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -20}
+  m_AnchoredPosition: {x: 0.000015259, y: 53}
   m_SizeDelta: {x: 669.0748, y: 242.5046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &560550928
@@ -3542,7 +3542,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000015259, y: -340}
+  m_AnchoredPosition: {x: 0.000015259, y: -427}
   m_SizeDelta: {x: 669.0748, y: 242.5046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &799022128
@@ -5306,7 +5306,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 0.000011444, y: 140}
+  m_AnchoredPosition: {x: 0.000011444, y: 213}
   m_SizeDelta: {x: 669.0748, y: 242.5046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1250863722
@@ -7055,7 +7055,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6376852882715292728, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
-      value: Quit
+      value: QuitButtonPressed
       objectReference: {fileID: 0}
     - target: {fileID: 6376852882715292728, guid: 43173406b02e1a54ca62a0aa0d8f178e, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
@@ -7824,7 +7824,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 659, y: -180}
+  m_AnchoredPosition: {x: 0.000015259, y: -107}
   m_SizeDelta: {x: 669.0748, y: 242.5046}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1951681592
