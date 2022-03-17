@@ -984,7 +984,7 @@ public class DynamicListManager : MonoBehaviour
                     colHeaderNames = new string[] { "Nehézség", "Kérdés", "Jó válasz", "Rossz válasz 1", "Rossz válasz 2", "Rossz válasz 3" };
                     colDatabaseFields = new string[] { "difficulty", "question", "good_answer", "bad_answer1", "bad_answer2", "bad_answer3" };
                     defaultSortingMode = new bool[] { true, true, true, true, true, true };
-                    textRectAnchors = new float[] { 0f, 0.0842f, 0.485f, 0.6125f, 0.74f, 0.871f, 1f };
+                    textRectAnchors = new float[] { 0f, 0.09f, 0.475f, 0.6f, 0.735f, 0.867f, 1f };
                     textFields = new Text[6];
                     textAnchors = new TextAnchor[] { TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft, TextAnchor.MiddleLeft };
                     break;

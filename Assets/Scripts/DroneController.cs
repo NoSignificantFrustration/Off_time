@@ -28,6 +28,8 @@ public class DroneController : MonoBehaviour, ISaveable
     public bool isSolvingPuzzle;
     /// <summary>Current NodeBlocker being solved</summary>
     private NodeBlocker blocker;
+    /// <summary>Layermask for the nodes</summary>
+    private LayerMask nodeMask;
 
     /// <summary>
     /// Gets references to components and sets up listener for left mouse click when the script is loaded.
@@ -39,7 +41,7 @@ public class DroneController : MonoBehaviour, ISaveable
         
         sr = GetComponent<SpriteRenderer>();
         controls.Player.Click.performed += Click;
-        
+        nodeMask = LayerMask.GetMask("Node");
     }
 
     /// <summary>
@@ -56,7 +58,7 @@ public class DroneController : MonoBehaviour, ISaveable
 
         //Click raycast check
         Vector2 mousePos = Camera.main.ScreenToWorldPoint(Mouse.current.position.ReadValue());
-        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero);
+        RaycastHit2D hit = Physics2D.Raycast(mousePos, Vector2.zero, 1f, nodeMask);
         //If the raycast hit and the hit object can be clicked do exactly that
         if (hit)
         {
