@@ -109,7 +109,7 @@ public class MainMenuManager : MonoBehaviour
                             ready = false;
                             registerFeedbackRects[i].gameObject.SetActive(true);
                             registerFeedbackRects[i].color = Color.red;
-                            registerFeedbackTexts[i].text = "A felhasználónévnek legalább 8 karaker hosszúnak kell lennie";
+                            registerFeedbackTexts[i].text = "Minimum 8 karakter";
                         }
                         break;
                     case 1:
@@ -118,7 +118,7 @@ public class MainMenuManager : MonoBehaviour
                             ready = false;
                             registerFeedbackRects[i].gameObject.SetActive(true);
                             registerFeedbackRects[i].color = Color.red;
-                            registerFeedbackTexts[i].text = "A jelszónak legalább 8 karaker hosszúnak kell lennie";
+                            registerFeedbackTexts[i].text = "Minimum 8 karakter";
                         }
                         break;
                     case 2:

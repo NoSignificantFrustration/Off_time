@@ -56,6 +56,8 @@ public class UIEventHandler : MonoBehaviour
     public static string loginRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9_]";
     /// <summary>General regex string</summary>
     public static string textRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _!?.()-]";
+    /// <summary>save regex string</summary>
+    public static string saveRegex = "[^A-ZÁÉÍÓÖÕÚÜÛa-záéíóöõúüû0-9 _.()-]";
 
     /// <summary>
     /// Gets needed references and subscribes CloseMenu to the escape button event.

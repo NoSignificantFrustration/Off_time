@@ -589,7 +589,7 @@ public class DynamicListManager : MonoBehaviour
     /// </summary>
     public void NewSave()
     {
-        Regex rgx = new Regex("[^A-Za-z0-9]");
+        Regex rgx = new Regex(UIEventHandler.saveRegex);
         bool ready = true;
 
 
